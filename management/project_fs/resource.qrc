@@ -1,0 +1,14 @@
+<RCC>
+  <qresource>
+    <file alias="mainBg">views/img/body.png</file>
+    <file alias="icon">views/img/icon.png</file>
+    <file alias="lg">views/img/lg.png</file>
+    <file alias="competidor">views/img/competidores2.png</file>
+    <file alias="apuestas">views/img/apuestas2.png</file>
+    <file alias="copa">views/img/copa.png</file>
+    <file alias="carreras">views/img/carreras.png</file>
+    <file alias="eventos">views/img/eventos.png</file>
+    <file alias="conf">views/img/config.png</file>
+    <file alias="caballo">views/img/caballo.png</file>
+  </qresource>
+</RCC>

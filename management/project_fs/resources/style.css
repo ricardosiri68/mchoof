@@ -1,0 +1,78 @@
+QMainWindow, QDialog{
+background-image: url(:mainBg) repeat;
+}
+
+QGroupBox QLabel, QTabWidget QGroupBox QLabel,QLabel{color: white;}
+QTabWidget QLabel{color: rgb(85, 85, 85);}
+QGroupBox, QGroupBox QRadioButton{color:white}
+
+QGroupBox{
+border: .5px solid #D14836;
+padding:0px;
+padding-top: 20px;
+background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 rgba(168, 168, 168, 162), stop:1 rgba(114, 114, 114, 255));
+}
+/*
+QMenuBar{	background-color:rgba(69,72,77,1) 0%, rgba(0,0,0,1) 100%);
+			border: 0.8px solid #ccc;
+
+}*/
+QGroupBox::title{
+margin: 0px;
+border: .5px solid #D14836;
+background-color:qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(255, 255, 255, 255), stop:0.0285714 rgba(221, 75, 57, 255), stop:1 rgba(209, 2, 54, 255));
+padding: 5px;
+border-bottom-right-radius: 5px;
+color:#DDDDDD;
+}
+QPlainTextEdit[readOnly="true"],QLineEdit[readOnly="true"] ,QDoubleSpinBox[readOnly="true"],QSpinBox[readOnly="true"]{ 
+color: rgb(255, 0, 0);
+ }
+
+QPlainTextEdit{
+border-radius: 5px;
+background-color:white;
+border: 1px solid rgb(75, 75, 75);
+}
+QPushButton{
+background-color:qlineargradient(spread:pad,x1:0, y1:0, x2:0, y2:1, stop:0 rgba(255, 255, 255, 50), stop:0.0285714 rgba(104, 145, 231, 75), stop:1 rgba(48, 78, 166, 125));
+color: #ccc;
+border: 1px solid rgba(48, 78, 166, 75);
+border-radius:3px;
+padding: 10px;
+font-weight: bold;
+}
+QPushButton:disabled{
+background-color: #000;
+color:  gray;
+}
+QGroupBox:disabled{
+border-color: #000;
+}
+QGroupBox::title:disabled{
+border-color:  #000;
+background-color:#000
+}
+QPushButton:hover{
+background-color:rgba(48, 78, 166, 125);
+color: rgb(158, 158, 158);
+}
+
+QListView{
+show-decoration-selected: 1;
+selection-color: red;
+}
+
+QTableView{
+alternate-background-color: rgb(255, 255, 146);
+background-color: rgb(255, 254, 207);
+color: #333333;
+font-size: 14px;
+}
+QTableView:disabled{
+background-color:rgb(170, 170, 127);
+}
+QTableView QHeaderView::section{
+background-color: #333333;
+color: #FFFFFF;
+}
