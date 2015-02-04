@@ -9,6 +9,9 @@ class ConfParser:
         self.__document = parse(filename)
 
     def document(self):
+        return self.__document
+
+    def rootNode(self):
         return self.__document.childNodes[0]
 
     def filename(self):

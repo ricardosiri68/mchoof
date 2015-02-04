@@ -1,5 +1,6 @@
 import os
 from .parser import ConfParser
+from . import exceptions
 
 
 class MenuBarParser(ConfParser):
@@ -12,7 +13,7 @@ class MenuBarParser(ConfParser):
         )
         ConfParser.__init__(self, conf_path)
         parentMenu = parent.menubar
-        self.bindActions(parentMenu, self.document().childNodes)
+        self.bindActions(parentMenu, self.rootNode().childNodes)
 
     def bindActions(self, parentMenu, actions):
         for action in actions:
@@ -25,6 +26,7 @@ class MenuBarParser(ConfParser):
                     )
 
                 elif action.parentNode.tagName == 'action':
+
                     if action.childNodes:
 
                         self.bindActions(
@@ -37,10 +39,20 @@ class MenuBarParser(ConfParser):
                         self.bindAction(parentMenu, action)
 
     def bindRootAction(self, rootMenu, action):
-        menu = rootMenu.addMenu(action.getAttribute('title'))
+        name = action.getAttribute('name').capitalize()
+        title = action.getAttribute('title')
+
+        if not name:
+            raise exceptions.MenuNameError(action)
+
+        if not title:
+            raise exceptions.MenuTitleError(action)
+
+        menu = rootMenu.addMenu(title)
+
         setattr(
             rootMenu,
-            'rootMenu%s' % action.getAttribute('name').capitalize(),
+            'rootMenu%s' % name,
             menu
         )
         return menu
