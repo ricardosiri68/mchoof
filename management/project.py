@@ -43,7 +43,10 @@ class StartProject:
         'icon.ico', 'resource.qrc', 'resource_rc.py', 'main.py', 'setup.py'
     )
 
-    main_app_files = 'settings.py', 'local_settings.py', 'views.py'
+    main_app_files = (
+        'settings.py', 'local_settings.py', 'views.py',
+        os.path.join('conf', 'menubar.xml')
+    )
     resource_files = 'style.css',
     templates_files = 'mainFrame.ui', 'mainWindow.ui'
     database_dirs = 'migrations', 'initdata', 'extra', 'dumpschema'

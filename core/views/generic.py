@@ -1,8 +1,9 @@
 import os
-from . import exceptions
 from PySide import QtCore, QtGui
 from PySide.QtCore import Slot, QMetaObject
 from PySide.QtUiTools import QUiLoader
+from mchoof.core.config import menubar
+from . import exceptions
 
 
 class UiLoader(QUiLoader):
@@ -67,7 +68,6 @@ def loadUi(uifile, baseinstance=None):
 
 class BaseView(object):
 
-
     def __init__(self):
 
         if not self.template_name:
@@ -86,6 +86,7 @@ class View(BaseView, QtGui.QFrame):
 class MainView(BaseView, QtGui.QMainWindow):
 
     main_widget = None
+    menubar_conf = None
 
     def __init__(self, parent=None, main_app=None):
         QtGui.QMainWindow.__init__(self, parent)
@@ -97,3 +98,6 @@ class MainView(BaseView, QtGui.QMainWindow):
             raise exceptions.MainWidgetError()
 
         self.setCentralWidget(self.main_widget(self))
+
+        if self.menubar_conf:
+            menubar.MenuBarParser(self)
