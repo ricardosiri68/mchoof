@@ -78,7 +78,7 @@ class BaseView(object):
 
 class View(BaseView, QtGui.QFrame):
 
-    def __init__(self, parent=None):
+    def __init__(self, parent):
         QtGui.QFrame.__init__(self, parent)
         BaseView.__init__(self)
 
@@ -101,3 +101,16 @@ class MainView(BaseView, QtGui.QMainWindow):
 
         if self.menubar_conf:
             menubar.MenuBarParser(self)
+
+    def actionExit(self):
+        pass
+
+    def loadPanelView(self, ViewClass):
+        return lambda: self.setCentralWidget(ViewClass(self))
+
+
+class PanelView(BaseView, QtGui.QFrame):
+
+    def __init__(self, parent):
+        QtGui.QFrame.__init__(self, parent)
+        BaseView.__init__(self)
