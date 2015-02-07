@@ -1,4 +1,5 @@
 import os
+from PySide.QtCore import SIGNAL
 from .parser import ConfParser
 from . import exceptions
 
@@ -11,8 +12,9 @@ class MenuBarParser(ConfParser):
             'conf',
             parent.menubar_conf
         )
+        self.parent = parent
         ConfParser.__init__(self, conf_path)
-        parentMenu = parent.menubar
+        parentMenu = self.parent.menubar
         self.bindActions(parentMenu, self.rootNode().childNodes)
 
     def bindActions(self, parentMenu, actions):
@@ -38,7 +40,7 @@ class MenuBarParser(ConfParser):
 
                         self.bindAction(parentMenu, action)
 
-    def bindRootAction(self, rootMenu, action):
+    def bindMenu(self, format_name, parentMenu, action):
         name = action.getAttribute('name').capitalize()
         title = action.getAttribute('title')
 
@@ -48,23 +50,64 @@ class MenuBarParser(ConfParser):
         if not title:
             raise exceptions.MenuTitleError(action)
 
-        menu = rootMenu.addMenu(title)
+        menu = parentMenu.addMenu(title)
 
-        setattr(
-            rootMenu,
-            'rootMenu%s' % name,
-            menu
-        )
-        return menu
-
-    def bindMenuAction(self, parentMenu, action):
-        menu = parentMenu.addMenu(action.getAttribute('title'))
         setattr(
             parentMenu,
-            'menu%s' % action.getAttribute('name').capitalize(),
+            format_name % name,
             menu
         )
+
         return menu
 
+    def bindRootAction(self, rootMenu, action):
+
+        return self.bindMenu('rootMenu%s', rootMenu, action)
+
+    def bindMenuAction(self, parentMenu, action):
+
+        return self.bindMenu('menu%s', parentMenu, action)
+
     def bindAction(self, parentMenu, action):
-        pass
+
+        name = action.getAttribute('name')
+        target = action.getAttribute('target')
+        title = action.getAttribute('title')
+
+        if not name:
+            raise exceptions.MenuNameError(action)
+
+        if not title:
+            raise exceptions.MenuTitleError(action)
+
+        if not target:
+            raise exceptions.ActionTargetError(action)
+
+        actionMenu = parentMenu.addAction(title)
+
+        setattr(
+            parentMenu,
+            'action%s' % name.capitalize(),
+            actionMenu
+        )
+
+        if ":" in target:
+
+            self.bindView(actionMenu, target)
+
+    def bindView(self, actionMenu, target):
+
+            package_app, viewClassName = target.split(':')
+
+            viewClassName = ''.join([
+                name_peace.capitalize()
+                for name_peace in viewClassName.split('-')
+            ])
+
+            view_module = __import__('%s.views' % package_app)
+            class_view = getattr(view_module.views, viewClassName)
+
+            actionMenu.connect(
+                SIGNAL('triggered()'),
+                self.parent.loadPanelView(class_view)
+            )

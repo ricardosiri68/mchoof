@@ -26,6 +26,14 @@ class MenuNameError(XMLNodeException):
 
 
 class MenuTitleError(XMLNodeException):
+
     def __init__(self, action):
         message = 'The menu item has no title attibute'
         super(MenuTitleError, self).__init__(action, message)
+
+
+class ActionTargetError(XMLNodeException):
+
+    def __init__(self, action):
+        message = 'The action menu item has no target'
+        super(ActionTargetError, self).__init__(action, message)
