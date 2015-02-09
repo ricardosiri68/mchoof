@@ -1,9 +1,13 @@
+import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 
-def get_session_class(database_url):
+app_settings = __import__(os.environ.get('MCHOOF_SETTINGS'))
 
-    engine = create_engine(database_url)
+
+def get_session():
+
+    engine = create_engine(app_settings.settings.DATABASE_URL)
     Session = sessionmaker(bind=engine)
     return Session()
