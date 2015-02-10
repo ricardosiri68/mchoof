@@ -1,12 +1,11 @@
-from .db_session import get_session
+import os
 from PySide.QtGui import QApplication
 
 
 class HoofApp(QApplication):
 
-    def initSettings(self, settings_module):
+    def initSettings(self):
         '''
         inizializa las variables de configuracion como atributos del la app
         '''
-        if hasattr(settings_module, 'DATABASE_URL'):
-            self.session = get_session(settings_module.DATABASE_URL)
+        os.environ.setdefault('MCHOOF_SETTINGS', 'main_app.settings')

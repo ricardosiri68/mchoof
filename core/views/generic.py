@@ -1,6 +1,6 @@
 import os
-from PySide import QtCore, QtGui
-from PySide.QtCore import Slot, QMetaObject
+from PySide import QtGui
+from PySide.QtCore import QMetaObject
 from PySide.QtUiTools import QUiLoader
 from mchoof.core.config import menubar
 from . import exceptions
