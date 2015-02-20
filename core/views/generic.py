@@ -2,7 +2,7 @@ import os
 from PySide import QtGui
 from PySide.QtCore import QMetaObject
 from PySide.QtUiTools import QUiLoader
-from mchoof.core.config import menubar
+from mchoof.core.config import menubar, model_binding
 from . import exceptions
 
 
@@ -111,6 +111,11 @@ class MainView(BaseView, QtGui.QMainWindow):
 
 class PanelView(BaseView, QtGui.QFrame):
 
+    models_binding_conf = None
+
     def __init__(self, parent):
         QtGui.QFrame.__init__(self, parent)
         BaseView.__init__(self)
+
+        if self.models_binding_conf:
+            model_binding.ModelBindingParser(self)

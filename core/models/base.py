@@ -7,13 +7,13 @@ session = db_session.get_session()
 
 def query_method(meth):
 
-    def query_method(*args, **kwargs):
+    def query_wrapper(*args, **kwargs):
         model = args[0]
         model.reset()
         model.records = meth(*args, **kwargs)
         model.dataChanged.emit(QModelIndex(), QModelIndex())
 
-    return query_method
+    return query_wrapper
 
 
 class TableModel(QAbstractTableModel):

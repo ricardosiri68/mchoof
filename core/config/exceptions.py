@@ -37,3 +37,33 @@ class ActionTargetError(XMLNodeException):
     def __init__(self, action):
         message = 'The action menu item has no target'
         super(ActionTargetError, self).__init__(action, message)
+
+
+class ModelBindingNameError(XMLNodeException):
+
+    def __init__(self, binding):
+        message = 'The binding has no name attribute'
+        super(ModelBindingNameError, self).__init__(binding, message)
+
+
+class ModelBindingViewAttributeError(XMLNodeException):
+
+    def __init__(self, view, attribute_name, binding):
+        message = 'The View {view_class} has no attribute called {name}'\
+            .format(
+                view_class=view.__class__.__name__,
+                name=attribute_name
+            )
+        super(ModelBindingViewAttributeError, self).__init__(binding, message)
+
+
+class ModelQuerymethodError(XMLNodeException):
+
+    def __init__(self, view, model, querymethod_name, binding):
+        message = 'The model {model_classname} setted on the view\
+            {view_classname} dont\'t has a queymethod called {quermethod_name}\
+            '.format(
+            model_classname=model.__class__.__name__,
+            view_classname=view.__class__.__name__,
+            querymethod_name=querymethod_name)
+        super(ModelQuerymethodError, self).__init__(binding, message)
