@@ -12,8 +12,10 @@ class QueryMethod:
 
         def query_wrapper(*args, **kwargs):
             model = QueryMethod.before_wrapper(meth, args, kwargs)
-            model.records = model.current_query.all()
+            model.records = meth(*args, **kwargs).all()
             QueryMethod.after_wrapper(model)
+
+            return model.records
 
         return query_wrapper
 
@@ -22,8 +24,11 @@ class QueryMethod:
 
         def query_wrapper(*args, **kwargs):
             model = QueryMethod.before_wrapper(meth, args, kwargs)
-            model.records = model.current_query.first()
+            result = meth(*args, **kwargs).first()
+            model.records = [result]
             QueryMethod.after_wrapper(model)
+
+            return result
 
         return query_wrapper
 
@@ -32,8 +37,11 @@ class QueryMethod:
 
         def query_wrapper(*args, **kwargs):
             model = QueryMethod.before_wrapper(meth, args, kwargs)
-            model.records = model.current_query.one()
+            result = meth(*args, **kwargs).one()
+            model.records = [result]
             QueryMethod.after_wrapper(model)
+
+            return result
 
         return query_wrapper
 
@@ -42,8 +50,11 @@ class QueryMethod:
 
         def query_wrapper(*args, **kwargs):
             model = QueryMethod.before_wrapper(meth, args, kwargs)
-            model.records = model.current_query.scalar()
+            result = meth(*args, **kwargs).scalar()
+            model.records = [result]
             QueryMethod.after_wrapper(model)
+
+            return result
 
         return query_wrapper
 
@@ -51,7 +62,13 @@ class QueryMethod:
     def before_wrapper(meth, args, kwargs):
         model = args[0]
         model.reset()
-        model.current_query = meth(*args, **kwargs)
+
+        model.current_query = {
+            'method': meth,
+            'args': args,
+            'kwargs': kwargs
+        }
+
         return model
 
     @staticmethod
@@ -82,6 +99,12 @@ class TableModel(QAbstractTableModel):
     def data_display(self, index):
         keys = self.schema.__table__.columns.keys()
         return getattr(self.records[index.row()], keys[index.column()])
+
+    def refresh(self):
+        self.current_query['method'](
+            *self.current_query['args'],
+            **self.current_query['kwargs']
+        )
 
     @QueryMethod.all
     def query(self):
