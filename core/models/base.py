@@ -5,15 +5,58 @@ from mchoof.core import db_session
 session = db_session.get_session()
 
 
-def query_method(meth):
+class QueryMethod:
 
-    def query_wrapper(*args, **kwargs):
+    @staticmethod
+    def all(meth):
+
+        def query_wrapper(*args, **kwargs):
+            model = QueryMethod.before_wrapper(meth, args, kwargs)
+            model.records = model.current_query.all()
+            QueryMethod.after_wrapper(model)
+
+        return query_wrapper
+
+    @staticmethod
+    def first(meth):
+
+        def query_wrapper(*args, **kwargs):
+            model = QueryMethod.before_wrapper(meth, args, kwargs)
+            model.records = model.current_query.first()
+            QueryMethod.after_wrapper(model)
+
+        return query_wrapper
+
+    @staticmethod
+    def one(meth):
+
+        def query_wrapper(*args, **kwargs):
+            model = QueryMethod.before_wrapper(meth, args, kwargs)
+            model.records = model.current_query.one()
+            QueryMethod.after_wrapper(model)
+
+        return query_wrapper
+
+    @staticmethod
+    def scalar(meth):
+
+        def query_wrapper(*args, **kwargs):
+            model = QueryMethod.before_wrapper(meth, args, kwargs)
+            model.records = model.current_query.scalar()
+            QueryMethod.after_wrapper(model)
+
+        return query_wrapper
+
+    @staticmethod
+    def before_wrapper(meth, args, kwargs):
         model = args[0]
         model.reset()
-        model.records = meth(*args, **kwargs)
-        model.dataChanged.emit(QModelIndex(), QModelIndex())
+        model.current_query = meth(*args, **kwargs)
+        return model
 
-    return query_wrapper
+    @staticmethod
+    def after_wrapper(model_instance):
+        model_instance.dataChanged.emit(QModelIndex(), QModelIndex())
 
 
 class TableModel(QAbstractTableModel):
@@ -40,6 +83,6 @@ class TableModel(QAbstractTableModel):
         keys = self.schema.__table__.columns.keys()
         return getattr(self.records[index.row()], keys[index.column()])
 
-    @query_method
+    @QueryMethod.all
     def query(self):
-        return self.objects.all()
+        return self.objects
