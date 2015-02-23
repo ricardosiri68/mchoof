@@ -100,7 +100,8 @@ class ModelBindMapperParser:
             if not hasattr(self.parent, selectorview):
                 raise exceptions.ModelBindingViewAttributeError(
                     self.parent,
-                    selectorview
+                    selectorview,
+                    element
                 )
 
             selectorview = getattr(self.parent, selectorview)
