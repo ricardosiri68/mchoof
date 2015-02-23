@@ -65,5 +65,82 @@ class ModelQuerymethodError(XMLNodeException):
             '.format(
             model_classname=model.__class__.__name__,
             view_classname=view.__class__.__name__,
-            querymethod_name=querymethod_name)
+            querymethod_name=querymethod_name
+        )
         super(ModelQuerymethodError, self).__init__(binding, message)
+
+
+class ModelBindingTableWidthFieldError(XMLNodeException):
+    def __init__(self, view, fieldname, binding):
+        message = 'The width of the field {fieldname} is not AUTO or a int on\
+            the view {view_classname}'.format(
+            view_classname=view.__class__.__name__,
+            fieldname=fieldname
+        )
+        super(ModelBindingTableWidthFieldError, self).__init__(
+            binding,
+            message
+        )
+
+
+class ModelBindingTableFieldnameError(XMLNodeException):
+
+    def __init__(self, view, model, fieldname, binding):
+        message = 'The fieldname "{fieldname}" doesn\'t exist on the model\
+            {model_classname} on the view {view_classname}'.format(
+            fieldname=fieldname,
+            model_classname=model.schema.__class__.__name__,
+            view_classname=view.__class__.__name__
+        )
+        super(ModelBindingTableFieldnameError, self).__init__(binding, message)
+
+
+class ModelBindingMapperAttributeError(XMLNodeException):
+
+    def __init__(self, view, attribute_name, binding):
+        message = 'The View {view_class} already has a attribute called\
+            {name}'.format(
+            view_class=view.__class__.__name__,
+            name=attribute_name
+        )
+        super(ModelBindingMapperAttributeError, self).__init__(
+            binding,
+            message
+        )
+
+
+class ModelBindingMapperSelectorViewError(XMLNodeException):
+
+    def __init__(self, binding):
+        message = 'The selector view on the mapper config is empty'
+        super(ModelBindingMapperSelectorViewError, self).__init__(
+            binding,
+            message
+        )
+
+
+class ModelBindingMappingAttributeError(XMLNodeException):
+
+    def __init__(self, view, attrname, binding):
+        message = 'The mapper don\'t has {attrname} defined on the view\
+            {view_classname}'.format(
+            attrname=attrname,
+            view_classname=view.__class__.__name__
+        )
+        super(ModelBindingMappingAttributeError, self).__init__(
+            binding,
+            message
+        )
+
+
+class ModelBindingMappingFieldError(XMLNodeException):
+
+    def __init__(self, mapper, fieldname, binding):
+        message = 'Fail to map de the field {fieldname}\
+            on view {view_classname} from the model\
+            {model_classname}'.format(
+            fieldname=fieldname,
+            view_classname=mapper.parent().__class__.__name__,
+            model_classname=mapper.model().__class__.__name__
+        )
+        super(ModelBindingMappingFieldError, self).__init__(binding, message)

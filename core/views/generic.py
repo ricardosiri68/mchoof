@@ -109,7 +109,7 @@ class MainView(BaseView, QtGui.QMainWindow):
         return lambda: self.setCentralWidget(ViewClass(self))
 
 
-class PanelView(BaseView, QtGui.QFrame):
+class PanelView(View, QtGui.QFrame):
 
     models_binding_conf = None
 
@@ -119,3 +119,6 @@ class PanelView(BaseView, QtGui.QFrame):
 
         if self.models_binding_conf:
             model_binding.ModelBindingParser(self)
+
+    def connectMapper(self, mapper):
+        return lambda current, previus: mapper.setCurrentModelIndex(current)
