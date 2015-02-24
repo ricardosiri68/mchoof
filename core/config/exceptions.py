@@ -32,6 +32,24 @@ class MenuTitleError(XMLNodeException):
         super(MenuTitleError, self).__init__(action, message)
 
 
+class MenuWidgetValueError(XMLNodeException):
+
+    def __init__(self, binding):
+        message = 'The menu has no valid widget attribute'
+        super(MenuWidgetValueError, self).__init__(binding, message)
+
+
+class ViewAttributeError(XMLNodeException):
+
+    def __init__(self, view, attribute_name, binding):
+        message = 'The view {view_classname} has no attribute called\
+            {attribute_name}'.format(
+            view_classname=view.__class__.__name__,
+            attribute_name=attribute_name
+        )
+        super(ViewAttributeError, self).__init__(binding, message)
+
+
 class ActionTargetError(XMLNodeException):
 
     def __init__(self, action):

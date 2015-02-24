@@ -2,7 +2,7 @@ import os
 from PySide import QtGui
 from PySide.QtCore import QMetaObject
 from PySide.QtUiTools import QUiLoader
-from mchoof.core.config import menubar, model_binding
+from mchoof.core.config import menubar, model_binding, contextual_menu
 from . import exceptions
 
 
@@ -112,6 +112,7 @@ class MainView(BaseView, QtGui.QMainWindow):
 class PanelView(View, QtGui.QFrame):
 
     models_binding_conf = None
+    contextual_menus_conf = None
 
     def __init__(self, parent):
         QtGui.QFrame.__init__(self, parent)
@@ -120,5 +121,11 @@ class PanelView(View, QtGui.QFrame):
         if self.models_binding_conf:
             model_binding.ModelBindingParser(self)
 
+        if self.contextual_menus_conf:
+            contextual_menu.ContextMenuParser(self)
+
     def connectMapper(self, mapper):
         return lambda current, previus: mapper.setCurrentModelIndex(current)
+
+    def showContextMenu(self, menu, widget):
+        return lambda point: menu.exec_(widget.mapToGlobal(point))
