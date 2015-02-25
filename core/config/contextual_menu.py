@@ -1,6 +1,6 @@
 import os
-from PySide.QtCore import SIGNAL
-from PySide.QtGui import QMenu
+from PySide.QtCore import SIGNAL, Qt
+from PySide.QtGui import QMenu, QShortcut, QKeySequence
 from .parser import ConfParser
 from . import exceptions
 
@@ -78,7 +78,7 @@ class ContextMenuParser(ConfParser):
     def bindAction(self, menu, action_element):
         name = action_element.getAttribute('name')
         target = action_element.getAttribute('target')
-        # shortcut = action_element.getAttribute('shortcut')
+        shortcut = action_element.getAttribute('shortcut')
         title = action_element.getAttribute('title')
 
         if not name:
@@ -99,7 +99,37 @@ class ContextMenuParser(ConfParser):
 
         action = menu.addAction(title)
         setattr(menu, 'action%s' % name, action)
+        attr_target = getattr(self.parent, target)
         action.connect(
             SIGNAL('triggered()'),
-            getattr(self.parent, target)
+            attr_target
         )
+
+        if not shortcut and action_element.hasAttribute('shortcut'):
+            raise exceptions.MenuShortcutError(action_element)
+
+        else:
+            try:
+                keysequence = QKeySequence(self.getKeySecuence(shortcut))
+                QShortcut(keysequence, self.parent).connect(
+                    SIGNAL('activated()'),
+                    attr_target
+                )
+                action.setShortcut(keysequence)
+            except AttributeError:
+                raise exceptions.MenuShortcutKeysecuenceError(
+                    self.parent,
+                    shortcut,
+                    action_element
+                )
+
+    def getKeySecuence(self, shortcut):
+        secuence = shortcut.split("+")
+
+        if len(secuence) > 1:
+            return reduce(
+                lambda x, y: getattr(Qt, x) + getattr(Qt, y),
+                secuence
+            )
+        else:
+            return getattr(Qt, secuence[0])

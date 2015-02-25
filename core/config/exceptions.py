@@ -5,11 +5,10 @@ class XMLNodeException(Exception):
     def __init__(self, action, message):
         self.traceName(action)
         self.name_list.append(" >>> \n%s" % action.toprettyxml())
-        error_message = '{message} on:\n {trace}'.\
-            format(
-                message=message,
-                trace=" | ".join(self.name_list)
-            )
+        error_message = '{message} on:\n {trace}'.format(
+            message=message,
+            trace=" | ".join(self.name_list)
+        )
         super(XMLNodeException, self).__init__(error_message)
 
     def traceName(self, action):
@@ -30,6 +29,24 @@ class MenuTitleError(XMLNodeException):
     def __init__(self, action):
         message = 'The menu item has no title attibute'
         super(MenuTitleError, self).__init__(action, message)
+
+
+class MenuShortcutError(XMLNodeException):
+
+    def __init__(self, action):
+        message = 'The menu item has a shortcut with no value'
+        super(MenuShortcutError, self).__init__(action, message)
+
+
+class MenuShortcutKeysecuenceError(XMLNodeException):
+
+    def __init__(self, view, shortcut, action):
+        message = 'Wrong keysecuence on in the shortcut {shortcut} setted on\
+            the view {view_classname}'.format(
+            shortcut=shortcut,
+            view_classname=view.__class__.__name__
+        )
+        super(MenuShortcutKeysecuenceError, self).__init__(action, message)
 
 
 class MenuWidgetValueError(XMLNodeException):
