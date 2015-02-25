@@ -1,6 +1,6 @@
 import os
 from PySide import QtGui
-from PySide.QtCore import QMetaObject
+from PySide.QtCore import QMetaObject, SIGNAL
 from PySide.QtUiTools import QUiLoader
 from mchoof.core.config import menubar, model_binding, contextual_menu
 from . import exceptions
@@ -63,10 +63,31 @@ def loadUi(uifile, baseinstance=None):
     loader = UiLoader(baseinstance)
     widget = loader.load(uifile)
     QMetaObject.connectSlotsByName(widget)
-    return widget
+
+
+def modal_wrapper(modal=None):
+
+    def modal_decorator(func):
+
+        def modal_wrapper(parent):
+
+            modalinstance = modal(parent)
+            modalinstance.show()
+
+            modalinstance.connect(
+                SIGNAL('finished(int)'),
+                func
+            )
+
+        return modal_wrapper
+
+    return modal_decorator
 
 
 class BaseView(object):
+
+    models_binding_conf = None
+    contextual_menus_conf = None
 
     def __init__(self):
 
@@ -74,6 +95,18 @@ class BaseView(object):
             raise exceptions.NoTemplateError()
 
         loadUi(os.path.join('templates', self.template_name), self)
+
+        if self.models_binding_conf:
+            model_binding.ModelBindingParser(self)
+
+        if self.contextual_menus_conf:
+            contextual_menu.ContextMenuParser(self)
+
+    def connectMapper(self, mapper):
+        return lambda current, previus: mapper.setCurrentModelIndex(current)
+
+    def showContextMenu(self, menu, widget):
+        return lambda point: menu.exec_(widget.mapToGlobal(point))
 
 
 class View(BaseView, QtGui.QFrame):
@@ -109,23 +142,23 @@ class MainView(BaseView, QtGui.QMainWindow):
         return lambda: self.setCentralWidget(ViewClass(self))
 
 
-class PanelView(View, QtGui.QFrame):
+class ModalView(BaseView, QtGui.QDialog):
 
-    models_binding_conf = None
-    contextual_menus_conf = None
+    modal = True
+
+    def __init__(self, parent):
+        QtGui.QDialog.__init__(self, parent)
+        parent.setEnabled(False)
+        BaseView.__init__(self)
+        self.setEnabled(True)
+
+    def done(self, success):
+        self.parent().setEnabled(True)
+        super(ModalView, self).done(success)
+
+
+class PanelView(View, QtGui.QFrame):
 
     def __init__(self, parent):
         QtGui.QFrame.__init__(self, parent)
         BaseView.__init__(self)
-
-        if self.models_binding_conf:
-            model_binding.ModelBindingParser(self)
-
-        if self.contextual_menus_conf:
-            contextual_menu.ContextMenuParser(self)
-
-    def connectMapper(self, mapper):
-        return lambda current, previus: mapper.setCurrentModelIndex(current)
-
-    def showContextMenu(self, menu, widget):
-        return lambda point: menu.exec_(widget.mapToGlobal(point))
