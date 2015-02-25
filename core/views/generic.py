@@ -72,12 +72,8 @@ def modal_wrapper(modal=None):
         def modal_wrapper(parent):
 
             modalinstance = modal(parent)
-            modalinstance.show()
-
-            modalinstance.connect(
-                SIGNAL('finished(int)'),
-                func
-            )
+            result = modalinstance.exec_()
+            func(parent, result)
 
         return modal_wrapper
 
@@ -151,6 +147,14 @@ class ModalView(BaseView, QtGui.QDialog):
         parent.setEnabled(False)
         BaseView.__init__(self)
         self.setEnabled(True)
+        self.buttonBox.connect(
+            SIGNAL('accepted()'),
+            self.accept
+        )
+        self.buttonBox.connect(
+            SIGNAL('rejected()'),
+            self.reject
+        )
 
     def done(self, success):
         self.parent().setEnabled(True)
