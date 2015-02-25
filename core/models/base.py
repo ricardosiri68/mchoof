@@ -65,8 +65,8 @@ class QueryMethod:
         model.reset()
 
         model.current_query = {
-            'method': meth,
-            'args': args,
+            'method': meth.func_name,
+            'args': args[1:],
             'kwargs': kwargs
         }
 
@@ -112,7 +112,10 @@ class TableModel(QAbstractTableModel):
 
     def refresh(self):
 
-        self.current_query['method'](
+        getattr(
+            self,
+            self.current_query['method']
+        )(
             *self.current_query['args'],
             **self.current_query['kwargs']
         )
@@ -129,3 +132,12 @@ class TableModel(QAbstractTableModel):
     def query(self):
 
         return self.objects
+
+    def add(self, **kwargs):
+
+        self.session.add(self.schema(**kwargs))
+
+    def commit(self):
+
+        self.session.commit()
+        self.refresh()
