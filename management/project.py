@@ -7,7 +7,9 @@ import shutil
 class Command:
 
     def __init__(self, project_path):
+
         self.project_path = project_path
+
         try:
             command = self.commands[sys.argv[1]]
         except KeyError:
@@ -31,9 +33,15 @@ class Command:
         app_name, = args
         StartApp(self.project_path, app_name)
 
+    def alembic_env(self, *args):
+
+        alembic_path, = args if args else ('alembic',)
+        AlembicEnv(self.project_path, alembic_path)
+
     commands = {
         'startproject': start_project,
-        'startapp': start_app
+        'startapp': start_app,
+        'alembicenv': alembic_env
     }
 
 
@@ -44,14 +52,16 @@ class StartProject:
     )
 
     main_app_files = (
-        'settings.py', 'local_settings.py', 'views.py',
+        'settings.py', 'local_settings.py', 'views.py', '__init__.py',
         os.path.join('conf', 'menubar.xml')
     )
+
     resource_files = 'style.css',
     templates_files = 'mainFrame.ui', 'mainWindow.ui'
     database_dirs = 'migrations', 'initdata', 'extra', 'dumpschema'
 
     def __init__(self, path, name):
+
         self.__path = path  # ruta donde se iniciara el proyecto
         self.__name = name  # nombre del proyecto
 
@@ -59,7 +69,6 @@ class StartProject:
         self.make_main_dir()
         self.make_templates_dir()
         self.make_resources_dir()
-        self.make_database_dir()
 
         # COPY DIRS
         self.copy_main_files()
@@ -68,6 +77,7 @@ class StartProject:
         self.copy_templates_files()
 
     def make_main_app(self):
+
         main_app_fs = os.path.join(self.get_project_fs_dir(), 'main_app')
         startapp = StartApp(self.__main_path, 'main_app')
         app_path = startapp.app_path()
@@ -79,6 +89,7 @@ class StartProject:
             )
 
     def make_main_dir(self):
+
         # ruta del proyecto
         self.__main_path = os.path.join(self.__path, self.__name)
         if os.path.isdir(self.__main_path):
@@ -87,10 +98,12 @@ class StartProject:
         os.mkdir(self.__main_path)
 
     def get_project_fs_dir(self):
+
         module_dir = os.path.dirname(__file__)
         return os.path.join(module_dir, 'project_fs')
 
     def copy_main_files(self):
+
         project_fs = self.get_project_fs_dir()
 
         for main_file in self.main_files:
@@ -100,6 +113,7 @@ class StartProject:
             )
 
     def copy_resource_files(self):
+
         resources_fs = os.path.join(self.get_project_fs_dir(), 'resources')
         project_resource = os.path.join(self.__main_path, 'resources')
 
@@ -110,6 +124,7 @@ class StartProject:
             )
 
     def copy_templates_files(self):
+
         templates_fs = os.path.join(
             self.get_project_fs_dir(),
             'templates',
@@ -125,21 +140,14 @@ class StartProject:
             )
 
     def make_templates_dir(self):
+
         self.__templates_path = os.path.join(self.__main_path, 'templates')
         os.mkdir(self.__templates_path)
 
     def make_resources_dir(self):
+
         resources_path = os.path.join(self.__main_path, 'resources')
         os.mkdir(resources_path)
-
-    def make_database_dir(self):
-        database_path = os.path.join(self.__main_path, 'database')
-        os.mkdir(database_path)
-
-        for database_dir in self.database_dirs:
-            os.mkdir(
-                os.path.join(database_path, database_dir)
-            )
 
 
 class StartApp:
@@ -148,6 +156,7 @@ class StartApp:
     app_files = '__init__.py', 'schema.py', 'models.py', 'views.py'
 
     def __init__(self, path, name):
+
         self.__name = name
         self.__path = path
         self.__app_path = os.path.join(path, name)
@@ -155,6 +164,7 @@ class StartApp:
         self.__copy_files()
 
     def make_app_dir(self):
+
         view_conf_path = os.path.join(self.__app_path, 'conf')
 
         if os.path.isdir(self.__app_path):
@@ -167,13 +177,16 @@ class StartApp:
         os.mkdir(view_conf_path)
 
     def app_path(self):
+
         return self.__app_path
 
     def get_app_fs_dir(self):
+
         module_dir = os.path.dirname(__file__)
         return os.path.join(module_dir, self.app_fs_dir)
 
     def __copy_files(self):
+
         app_fs = self.get_app_fs_dir()
 
         for app_file in self.app_files:
@@ -181,3 +194,35 @@ class StartApp:
                 os.path.join(app_fs, app_file),
                 os.path.join(self.__app_path, app_file)
             )
+
+
+class AlembicEnv:
+
+    env_files = ('env.py', )
+    alembic_fs = 'alembic_fs'
+
+    def __init__(self, project_path, alembic_path):
+
+        self.alembic_path = os.path.join(project_path, alembic_path)
+
+        if not os.path.isdir(self.alembic_path):
+            raise exceptions.WrongPathForGenerateAlembicEnvError(
+                self.alembic_path
+            )
+
+        self.copy_env()
+
+    def copy_env(self):
+
+        alembic_fs = self.get_alembic_fs_dir()
+
+        for env_file in self.env_files:
+            shutil.copy2(
+                os.path.join(alembic_fs, env_file),
+                os.path.join(self.alembic_path, env_file)
+            )
+
+    def get_alembic_fs_dir(self):
+
+        module_dir = os.path.dirname(__file__)
+        return os.path.join(module_dir, self.alembic_fs)
