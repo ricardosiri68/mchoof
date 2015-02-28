@@ -179,3 +179,42 @@ class ModelBindingMappingFieldError(XMLNodeException):
             model_classname=mapper.model().__class__.__name__
         )
         super(ModelBindingMappingFieldError, self).__init__(binding, message)
+
+
+class ModelConfigNameError(XMLNodeException):
+
+    def __init__(self, model, element):
+        message = 'A model conf setted on {model_classname} has no name\
+            attribute'.format(
+            model_classname=model.__class__.__name__
+        )
+        super(ModelConfigNameError, self).__init__(element, message)
+
+
+class ModelConfNotFound(Exception):
+
+    def __init__(self, model):
+        message = 'The model conf of {model_classname} is not setted on\
+            model_config file'.format(
+            model_classname=model.__class__.__name__
+        )
+        super(ModelConfNotFound).__init__(message)
+
+
+class ModelConfigFieldnameError(XMLNodeException):
+
+    def __init__(self, model, element):
+        message = 'The model config of {model_classname} don\'t has fieldname'\
+            .format(model_classname=model.__class__.__name__)
+        super(ModelConfigFieldnameError, self).__init__(element, message)
+
+
+class ModelConfigNotHasFieldError(XMLNodeException):
+
+    def __init__(self, model, fieldname, element):
+        message = 'The model config of {model_classname} don\'t has the field\
+            {fieldname} on his schema'.format(
+            model_classname=model.__class__.__name__,
+            fieldname=fieldname
+        )
+        super(ModelConfigNotHasFieldError, self).__init__(element, message)

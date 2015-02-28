@@ -1,6 +1,7 @@
 from PySide.QtCore import QAbstractTableModel, Qt, QModelIndex
 from mchoof.core import db_session
 from mchoof.core.models import exceptions
+from mchoof.core.config.table_model import TableModelConfig
 
 
 session = db_session.get_session()
@@ -81,10 +82,18 @@ class TableModel(QAbstractTableModel):
 
     records = []
     session = session
+    model_config = None
 
     def __init__(self, parent=None):
 
         super(TableModel, self).__init__(parent)
+
+        self.headers = self.schema.__table__.columns.keys()
+        self.aligments = [Qt.AlignLeft for k in self.headers]
+
+        if self.model_config:
+            TableModelConfig(self)
+
         self.objects = self.session.query(self.schema)
 
     def columnCount(self, index=None):
@@ -99,8 +108,12 @@ class TableModel(QAbstractTableModel):
 
         if role == Qt.DisplayRole:
             return self.data_display(index)
+
         elif role == Qt.EditRole:
             return self.data_edit(index)
+
+        elif role == Qt.TextAlignmentRole:
+            return self.data_textalign(index)
 
     def data_display(self, index):
 
@@ -108,7 +121,18 @@ class TableModel(QAbstractTableModel):
         return getattr(self.records[index.row()], keys[index.column()])
 
     def data_edit(self, index):
+
         return self.data_display(index)
+
+    def data_textalign(self, index):
+
+        return self.aligments[index.column()]
+
+    def headerData(self, section, orientation, role=Qt.DisplayRole):
+        if role == Qt.DisplayRole and orientation == Qt.Horizontal:
+            return self.headers[section]
+        else:
+            super(TableModel, self).headerData(section, orientation, role)
 
     def refresh(self):
 
