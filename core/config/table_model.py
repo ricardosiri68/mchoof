@@ -1,5 +1,7 @@
 import os
 from PySide.QtCore import Qt
+from PySide.QtGui import QBrush, QColor
+from mchoof.core import utils
 from .parser import ConfParser
 from . import exceptions
 
@@ -56,6 +58,8 @@ class TableModelConfig(ConfParser):
         name = field_element.getAttribute('name')
         header = field_element.getAttribute('header')
         align = field_element.getAttribute('align')
+        background = field_element.getAttribute('background')
+        foreground = field_element.getAttribute('foreground')
 
         if not name:
             raise exceptions.ModelConfigFieldnameError(
@@ -83,5 +87,30 @@ class TableModelConfig(ConfParser):
             )
 
         index_column = self.fieldnames.index(name)
+
+        if field_element.hasAttribute('background'):
+            try:
+                colortuple = utils.hex_to_rgb(background)
+            except ValueError:
+                raise exceptions.ModelConfigHexColorError(
+                    self.model,
+                    'background',
+                    background,
+                    field_element
+                )
+            self.model.backgrounds[index_column] = QBrush(QColor(*colortuple))
+
+        if field_element.hasAttribute('foreground'):
+            try:
+                colortuple = utils.hex_to_rgb(foreground)
+            except ValueError:
+                raise exceptions.ModelConfigHexColorError(
+                    self.model,
+                    'foreground',
+                    foreground,
+                    field_element
+                )
+            self.model.foregrounds[index_column] = QBrush(QColor(*colortuple))
+
         self.model.headers[index_column] = header
         self.model.aligments[index_column] = self.aligments_mapping[align]

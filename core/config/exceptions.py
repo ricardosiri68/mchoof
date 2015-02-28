@@ -218,3 +218,16 @@ class ModelConfigNotHasFieldError(XMLNodeException):
             fieldname=fieldname
         )
         super(ModelConfigNotHasFieldError, self).__init__(element, message)
+
+
+class ModelConfigHexColorError(XMLNodeException):
+
+    def __init__(self, model, attrname, hexcolor, element):
+        message = '{hexcolor} is not a valid hexadecimal notation color on the\n\
+            attribute {attrname} on {model_classname}'\
+            .format(
+            hexcolor=hexcolor,
+            attrname=attrname,
+            model_classname=model.__class__.__name__
+        )
+        super(ModelConfigHexColorError, self).__init__(element, message)
