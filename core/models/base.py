@@ -89,7 +89,9 @@ class TableModel(QAbstractTableModel):
         super(TableModel, self).__init__(parent)
 
         self.headers = self.schema.__table__.columns.keys()
-        self.aligments = [Qt.AlignLeft for k in self.headers]
+        self.aligments = len(self.headers) * [Qt.AlignLeft]
+        self.backgrounds = len(self.headers) * [None]
+        self.foregrounds = len(self.headers) * [None]
 
         if self.model_config:
             TableModelConfig(self)
@@ -106,14 +108,8 @@ class TableModel(QAbstractTableModel):
 
     def data(self, index, role=Qt.DisplayRole):
 
-        if role == Qt.DisplayRole:
-            return self.data_display(index)
-
-        elif role == Qt.EditRole:
-            return self.data_edit(index)
-
-        elif role == Qt.TextAlignmentRole:
-            return self.data_textalign(index)
+        if role in self.data_methods:
+            return self.data_methods[role](self, index)
 
     def data_display(self, index):
 
@@ -127,6 +123,21 @@ class TableModel(QAbstractTableModel):
     def data_textalign(self, index):
 
         return self.aligments[index.column()]
+
+    def data_background(self, index):
+
+        return self.backgrounds[index.column()]
+
+    def data_foreground(self, index):
+        return self.foregrounds[index.column()]
+
+    data_methods = {
+        Qt.DisplayRole: data_display,
+        Qt.EditRole: data_edit,
+        Qt.TextAlignmentRole: data_textalign,
+        Qt.BackgroundRole: data_background,
+        Qt.ForegroundRole: data_foreground
+    }
 
     def headerData(self, section, orientation, role=Qt.DisplayRole):
         if role == Qt.DisplayRole and orientation == Qt.Horizontal:
