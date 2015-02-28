@@ -6,4 +6,6 @@ class FieldDoesntExist(Exception):
                 class_name=schema.__class__.__name__,
                 fieldname=fieldname
             )
-        super(NotFieldDoesntExist, self).__init__(message)
+        super(FieldDoesntExist, self).__init__(message)
+
+
