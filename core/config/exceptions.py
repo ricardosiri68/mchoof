@@ -223,7 +223,7 @@ class ModelConfigNotHasFieldError(XMLNodeException):
 class ModelConfigHexColorError(XMLNodeException):
 
     def __init__(self, model, attrname, hexcolor, element):
-        message = '{hexcolor} is not a valid hexadecimal notation color on the\n\
+        message = '{hexcolor} is not a valid hexadecimal notation color on the\
             attribute {attrname} on {model_classname}'\
             .format(
             hexcolor=hexcolor,
@@ -231,3 +231,80 @@ class ModelConfigHexColorError(XMLNodeException):
             model_classname=model.__class__.__name__
         )
         super(ModelConfigHexColorError, self).__init__(element, message)
+
+
+class SignalNameError(XMLNodeException):
+
+    def __init__(self, view, element):
+        message = 'The signal config on the view {view_classname} has no name'\
+            .format(view_classname=view.__class__.__name__)
+        super(SignalNameError, self).__init__(element, message)
+
+
+class SignalTargetError(XMLNodeException):
+
+    def __init__(self, view, element):
+        message = 'The signal config on the view {view_classname} has no\
+            target'.format(view_classname=view.__class__.__name__)
+        super(SignalTargetError, self).__init__(element, message)
+
+
+class SignalInvalidTargetError(XMLNodeException):
+
+    def __init__(self, view, target, element):
+        message = 'The view {view_classname} has no attribute called {target}'\
+            .format(
+                view_classname=view.__class__.__name__,
+                target=target
+            )
+        super(SignalInvalidTargetError, self).__init__(element, message)
+
+
+class SignalAttributeSenderNonValueError(XMLNodeException):
+
+    def __init__(self, view, qobject, element):
+
+        if view is qobject:
+            message = 'The signal config on {view_classname} has a non value \
+                sender'.format(view_classname=view.__class__.__name__)
+        else:
+            message = 'The signal config on {view_classname} has a attribute\
+            called {qobject_name} with non value sender'.format(
+                view_classname=view.__class__.__name__,
+                qobject_name=element.parentNode.getAttribute('name')
+            )
+
+        super(SignalAttributeSenderNonValueError, self).__init__(
+            element,
+            message
+        )
+
+
+class SignalQObjectNonHasAttrError(XMLNodeException):
+
+    def __init__(self, view,  qobject, attrname, element):
+        if view is qobject:
+            message = 'The signal config on {view_classname} who don\'t has\
+                attrname called {attrname}'.format(
+                view_classname=view.__class__name__,
+                attrname=attrname
+            )
+        else:
+            message = 'The signal config on {view_classname} has a qobject\
+                {qobject_name} who don\'t has attrname called {attrname}'\
+                .format(
+                view_classname=view.__class__.__name__,
+                qobject=element.parentNode.getAttribute('name'),
+                attrname=attrname
+            )
+        super(SignalQObjectNonHasAttrError, self).__init__(element, message)
+
+
+class SignalAttributeSenderNameError(XMLNodeException):
+
+    def __init__(self, view, element):
+        message = 'The signal  congig on {view_classname} has don\'t has name\
+            of the sender attribute'.format(
+            view_classname=view.__class__.__name__
+        )
+        super(SignalAttributeSenderNameError, self).__init__(element, message)

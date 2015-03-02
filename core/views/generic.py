@@ -2,7 +2,8 @@ import os
 from PySide import QtGui
 from PySide.QtCore import QMetaObject, SIGNAL
 from PySide.QtUiTools import QUiLoader
-from mchoof.core.config import menubar, model_binding, contextual_menu
+from mchoof.core.config import menubar, model_binding, contextual_menu,\
+    view_signals
 from . import exceptions
 
 
@@ -84,6 +85,7 @@ class BaseView(object):
 
     models_binding_conf = None
     contextual_menus_conf = None
+    signals_conf = None
 
     def __init__(self):
 
@@ -97,6 +99,9 @@ class BaseView(object):
 
         if self.contextual_menus_conf:
             contextual_menu.ContextMenuParser(self)
+
+        if self.signals_conf:
+            view_signals.SignalConfParser(self)
 
     def connectMapper(self, mapper):
         return lambda current, previus: mapper.setCurrentModelIndex(current)
