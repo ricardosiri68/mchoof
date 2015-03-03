@@ -1,81 +1,11 @@
-from PySide.QtCore import QAbstractTableModel, Qt, QModelIndex
+from PySide.QtCore import QAbstractTableModel, Qt
 from mchoof.core import db_session
 from mchoof.core.models import exceptions
+from mchoof.core.models.query_methods import QueryMethod
 from mchoof.core.config.table_model import TableModelConfig
 
 
 session = db_session.get_session()
-
-
-class QueryMethod:
-
-    @staticmethod
-    def all(meth):
-
-        def query_wrapper(*args, **kwargs):
-            model = QueryMethod.before_wrapper(meth, args, kwargs)
-            model.records = meth(*args, **kwargs).all()
-            QueryMethod.after_wrapper(model)
-
-            return model.records
-
-        return query_wrapper
-
-    @staticmethod
-    def first(meth):
-
-        def query_wrapper(*args, **kwargs):
-            model = QueryMethod.before_wrapper(meth, args, kwargs)
-            result = meth(*args, **kwargs).first()
-            model.records = [result]
-            QueryMethod.after_wrapper(model)
-
-            return result
-
-        return query_wrapper
-
-    @staticmethod
-    def one(meth):
-
-        def query_wrapper(*args, **kwargs):
-            model = QueryMethod.before_wrapper(meth, args, kwargs)
-            result = meth(*args, **kwargs).one()
-            model.records = [result]
-            QueryMethod.after_wrapper(model)
-
-            return result
-
-        return query_wrapper
-
-    @staticmethod
-    def scalar(meth):
-
-        def query_wrapper(*args, **kwargs):
-            model = QueryMethod.before_wrapper(meth, args, kwargs)
-            result = meth(*args, **kwargs).scalar()
-            model.records = [result]
-            QueryMethod.after_wrapper(model)
-
-            return result
-
-        return query_wrapper
-
-    @staticmethod
-    def before_wrapper(meth, args, kwargs):
-        model = args[0]
-        model.reset()
-
-        model.current_query = {
-            'method': meth.func_name,
-            'args': args[1:],
-            'kwargs': kwargs
-        }
-
-        return model
-
-    @staticmethod
-    def after_wrapper(model_instance):
-        model_instance.dataChanged.emit(QModelIndex(), QModelIndex())
 
 
 class TableModel(QAbstractTableModel):
@@ -163,11 +93,6 @@ class TableModel(QAbstractTableModel):
         except ValueError:
             raise exceptions.FieldDoesntExist(self.schema, fieldname)
 
-    @QueryMethod.all
-    def query(self):
-
-        return self.objects
-
     def add(self, **kwargs):
 
         self.session.add(self.schema(**kwargs))
@@ -176,3 +101,8 @@ class TableModel(QAbstractTableModel):
 
         self.session.commit()
         self.refresh()
+
+    @QueryMethod.all
+    def query(self):
+
+        return self.objects
