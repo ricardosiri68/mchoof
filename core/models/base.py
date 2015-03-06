@@ -13,6 +13,7 @@ class TableModel(QAbstractTableModel):
     records = []
     session = session
     model_config = None
+    filters_list = {}
 
     def __init__(self, parent=None):
 
