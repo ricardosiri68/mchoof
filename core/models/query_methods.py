@@ -1,3 +1,6 @@
+from PySide.QtCore import QModelIndex
+
+
 class QueryMethod:
 
     @staticmethod
