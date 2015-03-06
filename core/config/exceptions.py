@@ -171,14 +171,67 @@ class ModelBindingMappingAttributeError(XMLNodeException):
 class ModelBindingMappingFieldError(XMLNodeException):
 
     def __init__(self, mapper, fieldname, binding):
-        message = 'Fail to map de the field {fieldname}\
-            on view {view_classname} from the model\
-            {model_classname}'.format(
+        message = 'Fail to map de the field {fieldname} on view\
+            {view_classname} from the model {model_classname}'.format(
             fieldname=fieldname,
             view_classname=mapper.parent().__class__.__name__,
             model_classname=mapper.model().__class__.__name__
         )
         super(ModelBindingMappingFieldError, self).__init__(binding, message)
+
+
+class ModelBindingFilterNonInputError(XMLNodeException):
+
+    def __init__(self, view, element):
+        message = 'The model binding filter of {view_classname} has no input\
+            attribute'.format(view_classname=view.__class__.__name__)
+        super(ModelBindingFilterNonInputError, self).__init__(element, message)
+
+
+class ModelBindingFilterTypeMethodError(XMLNodeException):
+
+    def __init__(self, view, filter_type, element):
+        message = 'The model binding filter type {filter_type} of\
+            {view_clasname} non exist'.format(
+            view_classname=view.__class__.__name__,
+            filter_type=filter_type
+        )
+        super(ModelBindingFilterTypeMethodError, self).__init__(
+            element,
+            message
+        )
+
+
+class ModelBindingFilterNonTypeError(XMLNodeException):
+
+    def __init__(self, view, element):
+        message = 'The model binding filter of {view_classname} has no type'\
+            .format(view_classname=view.__class__.__name__)
+        super(ModelBindingFilterNonTypeError, self).__init__(element, message)
+
+
+class ModelBindingFilterMethodError(XMLNodeException):
+
+    def __init__(self, view, model, model_method, element):
+        message = 'The model binding filter {model_method} on the model\
+            {model_classname} defined on the view {view_classname} non exist'\
+            .format(
+            model_method=model_method,
+            model__classname=model.__class__.__name__,
+            view_classname=view.__class__.__name__
+        )
+        super(ModelBindingFilterMethodError, self).__init__(element, message)
+
+
+class ModelBindingNonFilterMethodError(XMLNodeException):
+
+    def __init__(self, view, element):
+        message = 'The model binding filter of {view_classname} non exist'\
+            .format(view_classname=view.__class__.__name__)
+        super(ModelBindingNonFilterMethodError, self).__init__(
+            element,
+            message
+        )
 
 
 class ModelConfigNameError(XMLNodeException):

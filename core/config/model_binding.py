@@ -3,6 +3,7 @@ from .parser import ConfParser
 from . import exceptions
 from .bind_mapper import ModelBindMapperParser
 from .bind_table import ModelBindTableParser
+from .bind_filter import ModelBindFilterParser
 
 
 class ModelBindingParser(ConfParser):
@@ -18,6 +19,7 @@ class ModelBindingParser(ConfParser):
 
         self.mapper_parser = ModelBindMapperParser(self)
         self.table_parser = ModelBindTableParser(self)
+        self.filter_parser = ModelBindFilterParser(self)
 
         self.bindModels()
 
@@ -60,3 +62,4 @@ class ModelBindingParser(ConfParser):
 
         self.table_parser.bindTables(model, binding.childNodes)
         self.mapper_parser.bindMappers(model, binding.childNodes)
+        self.filter_parser.bindFilters(model, binding.childNodes)
