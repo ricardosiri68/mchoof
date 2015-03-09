@@ -20,7 +20,7 @@ class QueryMethod:
 
         def query_wrapper(*args, **kwargs):
             model = QueryMethod.before_wrapper(meth, args, kwargs)
-            result = meth(*args, **kwargs).first()
+            result = model.current_query['query'].first()
             model.records = [result]
             QueryMethod.after_wrapper(model)
 
@@ -33,7 +33,7 @@ class QueryMethod:
 
         def query_wrapper(*args, **kwargs):
             model = QueryMethod.before_wrapper(meth, args, kwargs)
-            result = meth(*args, **kwargs).one()
+            result = model.current_query['query'].one()
             model.records = [result]
             QueryMethod.after_wrapper(model)
 
@@ -46,7 +46,7 @@ class QueryMethod:
 
         def query_wrapper(*args, **kwargs):
             model = QueryMethod.before_wrapper(meth, args, kwargs)
-            result = meth(*args, **kwargs).scalar()
+            result = model.current_query['query'].scalar()
             model.records = [result]
             QueryMethod.after_wrapper(model)
 
