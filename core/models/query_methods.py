@@ -8,7 +8,7 @@ class QueryMethod:
 
         def query_wrapper(*args, **kwargs):
             model = QueryMethod.before_wrapper(meth, args, kwargs)
-            model.records = meth(*args, **kwargs).all()
+            model.records = model.current_query['query'].all()
             QueryMethod.after_wrapper(model)
 
             return model.records
@@ -60,6 +60,7 @@ class QueryMethod:
         model.reset()
 
         model.current_query = {
+            'query': meth(*args, **kwargs),
             'method': meth.func_name,
             'args': args[1:],
             'kwargs': kwargs

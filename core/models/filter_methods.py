@@ -11,7 +11,7 @@ class FilterMethod:
 
             if model.filters_list:
                 model.records = model\
-                    .objects\
+                    .current_query['query']\
                     .filter(*model.filters_list.values())\
                     .all()
             else:
@@ -27,9 +27,11 @@ class FilterMethod:
         model = args[0]
         filter = meth(*args, **kwargs)
 
+        model.reset()
+
         if not filter is None:
             model.filters_list[meth.func_name] = filter
-            model.reset()
+
         elif meth.func_name in model.filters_list:
             del model.filters_list[meth.func_name]
 
