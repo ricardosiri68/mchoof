@@ -90,23 +90,73 @@ class ModelBindMapperParser:
 
     def configMapper(self, mapper, element):
 
+        selectorview = element.getAttribute('selectorview')
+        commiter = element.getAttribute('commiter')
+        accept = element.getAttribute('accept')
+        reject = element.getAttribute('reject')
+        done = element.getAttribute('done')
+
         if element.hasAttribute('selectorview'):
+            self.bindSelectorView(mapper, selectorview, element)
 
-            selectorview = element.getAttribute('selectorview')
+        if element.hasAttribute('commiter') and (accept or reject or done):
+            self.bindCommiter(mapper, commiter, accept, reject, done, element)
 
-            if not selectorview:
-                raise exceptions.ModelBindingMapperSelectorViewError(element)
+    def bindSelectorView(self, mapper, selectorview, element):
 
-            if not hasattr(self.parent, selectorview):
-                raise exceptions.ModelBindingViewAttributeError(
+        if not selectorview:
+            raise exceptions.ModelBindingMapperSelectorViewError(element)
+
+        if not hasattr(self.parent, selectorview):
+            raise exceptions.ModelBindingViewAttributeError(
+                self.parent,
+                selectorview,
+                element
+            )
+
+        selectorview = getattr(self.parent, selectorview)
+
+        selectorview.selectionModel().connect(
+            SIGNAL("currentChanged(QModelIndex, QModelIndex)"),
+            self.parent.connectMapper(mapper)
+        )
+
+    def bindCommiter(self, mapper, commiter, accept, reject, done, element):
+
+        if not hasattr(self.parent, commiter):
+
+            raise exceptions.ViewAttributeError(self.parent, commiter, element)
+
+        commiter_attr = getattr(self.parent, commiter)
+
+        if commiter_attr.__class__.__name__ != 'QDialogButtonBox':
+
+            raise exceptions.ModelBindingMappingCommiterError(
+                self.parent,
+                commiter,
+                element
+            )
+
+        actions = {
+            'accepted': accept,
+            'rejected': reject,
+            'clicked': done,
+        }
+
+        for key, value in actions.items():
+
+            if not value:
+                pass
+
+            if hasattr(self.parent, value):
+
+                action = getattr(self.parent, value)
+                getattr(commiter_attr, key).connect(action)
+
+            else:
+
+                raise exceptions.ViewAttributeError(
                     self.parent,
-                    selectorview,
+                    value,
                     element
                 )
-
-            selectorview = getattr(self.parent, selectorview)
-
-            selectorview.selectionModel().connect(
-                SIGNAL("currentChanged(QModelIndex, QModelIndex)"),
-                self.parent.connectMapper(mapper)
-            )

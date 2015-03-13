@@ -180,6 +180,20 @@ class ModelBindingMappingFieldError(XMLNodeException):
         super(ModelBindingMappingFieldError, self).__init__(binding, message)
 
 
+class ModelBindingMappingCommiterError(XMLNodeException):
+
+    def __init__(self, view, commiter, element):
+        message = 'The commiter {commiter} on the view {view_classname} is not\
+            a QDialogButtonBox'.format(
+            commiter=commiter,
+            view_classname=view.__class__.__name__
+        )
+        super(ModelBindingMappingCommiterError, self).__init__(
+            element,
+            message
+        )
+
+
 class ModelBindingFilterNonInputError(XMLNodeException):
 
     def __init__(self, view, element):
