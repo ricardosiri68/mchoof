@@ -21,7 +21,7 @@
   </property>
   <property name="windowIcon">
    <iconset>
-    <normaloff>:/icon</normaloff>:/icon</iconset>
+    <normaloff>:/app/appicon</normaloff>:/app/appicon</iconset>
   </property>
   <property name="styleSheet">
    <string notr="true"/>
@@ -53,7 +53,7 @@
   </widget>
  </widget>
  <resources>
-  <include location="../../../../../../../../../../workspace/noe_race/resource.qrc"/>
+  <include location="../../resource.qrc"/>
  </resources>
  <connections/>
 </ui>
