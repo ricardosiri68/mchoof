@@ -1,5 +1,4 @@
-# from main_app import AlchemyBase
+from main_app import AlchemyBase
+from sqlalchemy import Column, Integer
 
-
-# ... delcatative class go here, uncoment the first line and inerits from
-# ... AlchmeyBase and others sqlalchmey Fields types
+# Your Table Mappers go here
