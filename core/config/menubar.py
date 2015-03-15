@@ -1,5 +1,6 @@
 import os
-from PySide.QtCore import SIGNAL
+from PySide.QtGui import QPixmap, QIcon, QShortcut, QKeySequence
+from PySide.QtCore import SIGNAL, Qt
 from .parser import ConfParser
 from . import exceptions
 
@@ -73,6 +74,8 @@ class MenuBarParser(ConfParser):
         name = action.getAttribute('name')
         target = action.getAttribute('target')
         title = action.getAttribute('title')
+        icon = action.getAttribute('icon')
+        shortcut = action.getAttribute('shortcut')
 
         if not name:
             raise exceptions.MenuNameError(action)
@@ -101,6 +104,40 @@ class MenuBarParser(ConfParser):
                 SIGNAL('triggered()'),
                 getattr(self.parent, target)
             )
+
+        if icon:
+            actionMenu.setIcon(QIcon(QPixmap(icon)))
+
+        if not shortcut and action.hasAttribute('shortcut'):
+
+            raise exceptions.MenuShortcutError(action)
+
+        elif shortcut:
+
+            try:
+
+                keysequence = QKeySequence(self.getKeySecuence(shortcut))
+                actionMenu.setShortcut(keysequence)
+
+            except AttributeError:
+
+                raise exceptions.MenuShortcutKeysecuenceError(
+                    self.parent,
+                    shortcut,
+                    action
+                )
+
+    def getKeySecuence(self, shortcut):
+        secuence = shortcut.split("+")
+
+        if len(secuence) > 1:
+            return reduce(
+                lambda x, y: getattr(Qt, x) + getattr(Qt, y),
+                secuence
+            )
+
+        else:
+            return getattr(Qt, secuence[0])
 
     def bindView(self, actionMenu, target):
 

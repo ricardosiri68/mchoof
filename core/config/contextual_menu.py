@@ -1,6 +1,6 @@
 import os
 from PySide.QtCore import SIGNAL, Qt
-from PySide.QtGui import QMenu, QShortcut, QKeySequence
+from PySide.QtGui import QMenu, QShortcut, QKeySequence, QIcon, QPixmap
 from .parser import ConfParser
 from . import exceptions
 
@@ -80,6 +80,7 @@ class ContextMenuParser(ConfParser):
         target = action_element.getAttribute('target')
         shortcut = action_element.getAttribute('shortcut')
         title = action_element.getAttribute('title')
+        icon = action_element.getAttribute('icon')
 
         if not name:
             raise exceptions.MenuNameError(action_element)
@@ -104,6 +105,9 @@ class ContextMenuParser(ConfParser):
             SIGNAL('triggered()'),
             attr_target
         )
+
+        if icon:
+            action.setIcon(QIcon(QPixmap(icon)))
 
         if not shortcut and action_element.hasAttribute('shortcut'):
             raise exceptions.MenuShortcutError(action_element)
