@@ -1,3 +1,4 @@
+from PySide.QtCore import SIGNAL
 from . import exceptions
 
 
@@ -22,6 +23,7 @@ class ModelBindTableParser:
             table = getattr(self.parent, name)
 
         except AttributeError:
+
             raise exceptions.ModelBindingViewAttributeError(
                 self.parent,
                 name,

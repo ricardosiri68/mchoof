@@ -1,4 +1,4 @@
-from PySide.QtCore import QAbstractTableModel, Qt
+from PySide.QtCore import QAbstractTableModel, Qt, QModelIndex
 from mchoof.core import db_session
 from mchoof.core.models import exceptions
 from mchoof.core.models.query_methods import QueryMethod
@@ -70,6 +70,22 @@ class TableModel(QAbstractTableModel):
         Qt.ForegroundRole: data_foreground
     }
 
+    def setData(self, index, value, role=Qt.EditRole):
+        try:
+
+            setattr(
+                self.records[index.row()],
+                self.get_field_by_index(index.column()),
+                value
+            )
+
+            self.dataChanged.emit(index, index)
+            return True
+
+        except AttributeError or IndexError:
+
+            raise exceptions.ModelSetDataError(self, index, value)
+
     def headerData(self, section, orientation, role=Qt.DisplayRole):
         if role == Qt.DisplayRole and orientation == Qt.Horizontal:
             return self.headers[section]
@@ -94,14 +110,65 @@ class TableModel(QAbstractTableModel):
         except ValueError:
             raise exceptions.FieldDoesntExist(self.schema, fieldname)
 
-    def add(self, **kwargs):
+    def get_field_by_index(self, index):
 
-        self.session.add(self.schema(**kwargs))
+        return self.schema.__table__.columns.keys()[index]
 
-    def commit(self):
+    def get_index_by_object(self, obj):
+        return self.index(self.records.index(obj), 0)
+
+    def add(self, row, **kwargs):
+
+        index = self.index(row, 0)
+        self.beginInsertRows(index.parent(), index.row(), index.row())
+
+        newobject = self.schema(**kwargs)
+        self.session.add(newobject)
+        self.records.insert(index.row(), newobject)
+
+        self.endInsertRows()
+
+        return newobject
+
+    def save(self, index, **kwargs):
+
+        try:
+            schema_obj = self.records[index]
+        except IndexError:
+            raise exceptions.ModelIndexError(self, index)
+
+        for field, value in kwargs.items():
+
+            if not field in self.schema.__table__.columns.keys():
+                raise exceptions.FieldDoesntExist(self.schema, field)
+
+            setattr(schema_obj, field, value)
+
+        self.dataChanged.emit(QModelIndex(), QModelIndex())
+
+    def removeRow(self, row, index=QModelIndex()):
+
+        self.session.delete(self.records.pop(index.row()))
+        return True
+
+    def delete(self, index):
+
+        self.beginRemoveRows(index.parent(), index.row(), index.row())
+        self.session.delete(self.records.pop(index.row()))
+        self.endRemoveRows()
+
+        # print self.removeRow(index.row())
+        # self.dataChanged.emit(
+        #     self.index(index.row() - 1, 0),
+        #     self.index(0, 0)
+        # )
+
+    def commit(self, refresh=True):
 
         self.session.commit()
-        self.refresh()
+
+        if refresh:
+            self.refresh()
 
     @QueryMethod.all
     def query(self):

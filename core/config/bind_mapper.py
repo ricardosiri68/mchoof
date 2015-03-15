@@ -1,5 +1,4 @@
-from PySide.QtCore import SIGNAL
-from PySide.QtGui import QDataWidgetMapper
+from ..views.mappers import MhDataMapper
 from . import exceptions
 
 
@@ -18,25 +17,26 @@ class ModelBindMapperParser:
         name = element.getAttribute('name')
 
         if not name:
+
             raise exceptions.ModelBindingNameError(element)
 
-        mapper_name = 'mapper%s' % name.capitalize()
+        if hasattr(self. parent, name):
 
-        if hasattr(self. parent, mapper_name):
             raise exceptions.ModelBindingMapperAttributeError(
                 self.parent,
                 name,
                 element
             )
 
-        setattr(self.parent, mapper_name, QDataWidgetMapper(self.parent))
-        mapper = getattr(self.parent, mapper_name)
+        setattr(self.parent, name, MhDataMapper(self.parent))
+        mapper = getattr(self.parent, name)
         mapper.setModel(model)
 
         self.mapFields(mapper, element.childNodes)
         self.configMapper(mapper, element)
 
     def mapFields(self, mapper, elements):
+
         model = mapper.model()
 
         for element in elements:
@@ -46,6 +46,7 @@ class ModelBindMapperParser:
                 self.mapField(mapper, model, element)
 
     def mapField(self, mapper, model, mapping):
+
         inputname = mapping.getAttribute('input')
         fieldname = mapping.getAttribute('field')
 
@@ -91,6 +92,8 @@ class ModelBindMapperParser:
     def configMapper(self, mapper, element):
 
         selectorview = element.getAttribute('selectorview')
+        autosubmit = element.hasAttribute('autosubmit')
+
         commiter = element.getAttribute('commiter')
         accept = element.getAttribute('accept')
         reject = element.getAttribute('reject')
@@ -101,6 +104,9 @@ class ModelBindMapperParser:
 
         if element.hasAttribute('commiter') and (accept or reject or done):
             self.bindCommiter(mapper, commiter, accept, reject, done, element)
+
+        if autosubmit:
+            mapper.setSubmitPolicy(mapper.AutoSubmit)
 
     def bindSelectorView(self, mapper, selectorview, element):
 
@@ -115,11 +121,7 @@ class ModelBindMapperParser:
             )
 
         selectorview = getattr(self.parent, selectorview)
-
-        selectorview.selectionModel().connect(
-            SIGNAL("currentChanged(QModelIndex, QModelIndex)"),
-            self.parent.connectMapper(mapper)
-        )
+        mapper.setSelectorView(selectorview)
 
     def bindCommiter(self, mapper, commiter, accept, reject, done, element):
 
@@ -146,7 +148,7 @@ class ModelBindMapperParser:
         for key, value in actions.items():
 
             if not value:
-                pass
+                break
 
             if hasattr(self.parent, value):
 

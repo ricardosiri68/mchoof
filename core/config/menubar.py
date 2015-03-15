@@ -95,6 +95,13 @@ class MenuBarParser(ConfParser):
 
             self.bindView(actionMenu, target)
 
+        else:
+
+            actionMenu.connect(
+                SIGNAL('triggered()'),
+                getattr(self.parent, target)
+            )
+
     def bindView(self, actionMenu, target):
 
             package_app, viewClassName = target.split(':')

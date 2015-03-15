@@ -103,17 +103,14 @@ class BaseView(object):
         if self.signals_conf:
             view_signals.SignalConfParser(self)
 
-    def connectMapper(self, mapper):
-        return lambda current, previus: mapper.setCurrentModelIndex(current)
-
     def showContextMenu(self, menu, widget):
         return lambda point: menu.exec_(widget.mapToGlobal(point))
 
 
-class View(BaseView, QtGui.QFrame):
+class View(BaseView, QtGui.QWidget):
 
     def __init__(self, parent):
-        QtGui.QFrame.__init__(self, parent)
+        QtGui.QWidget.__init__(self, parent)
         BaseView.__init__(self)
 
 
@@ -140,6 +137,7 @@ class MainView(BaseView, QtGui.QMainWindow):
         pass
 
     def loadPanelView(self, ViewClass):
+
         return lambda: self.setCentralWidget(ViewClass(self))
 
 
@@ -148,26 +146,31 @@ class ModalView(BaseView, QtGui.QDialog):
     modal = True
 
     def __init__(self, parent):
+
         QtGui.QDialog.__init__(self, parent)
         parent.setEnabled(False)
         BaseView.__init__(self)
+
         self.setEnabled(True)
+
         self.buttonBox.connect(
             SIGNAL('accepted()'),
             self.accept
         )
+
         self.buttonBox.connect(
             SIGNAL('rejected()'),
             self.reject
         )
 
     def done(self, success):
+
         self.parent().setEnabled(True)
+
         super(ModalView, self).done(success)
 
 
-class PanelView(View, QtGui.QFrame):
+class PanelView(View):
 
-    def __init__(self, parent):
-        QtGui.QFrame.__init__(self, parent)
-        BaseView.__init__(self)
+    def __init__(self, parent=None):
+        View.__init__(self, parent)
