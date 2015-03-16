@@ -2,7 +2,7 @@
 <root>
 
     <action name="start" title="Inicio">
-        <action name="exit" title="Salir" target="action-exit"/>
+        <action name="exit" title="Salir" target="actionExit"/>
     </action>
 
 </root>

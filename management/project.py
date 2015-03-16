@@ -48,7 +48,7 @@ class Command:
 class StartProject:
 
     main_files = (
-        'icon.ico', 'resource.qrc', 'resource_rc.py', 'main.py', 'setup.py'
+        'resource.qrc', 'resource_rc.py', 'main.py', 'setup.py'
     )
 
     main_app_files = (
@@ -57,6 +57,11 @@ class StartProject:
     )
 
     resource_files = 'style.css',
+    resource_icons = [
+        'add.png', 'bullet-green.png', 'bullet-red.png', 'checked.png',
+        'config.png', 'delete.png', 'edit.png', 'icon.png', 'save.png',
+        'seach.png', 'unchecked.png'
+    ]
     templates_files = 'mainFrame.ui', 'mainWindow.ui'
     database_dirs = 'migrations', 'initdata', 'extra', 'dumpschema'
 
@@ -117,10 +122,19 @@ class StartProject:
         resources_fs = os.path.join(self.get_project_fs_dir(), 'resources')
         project_resource = os.path.join(self.__main_path, 'resources')
 
+        resources_icons_fs = os.path.join(resources_fs, 'icons')
+        project_icons = os.path.join(project_resource, 'icons')
+
         for resource_file in self.resource_files:
             shutil.copy2(
                 os.path.join(resources_fs, resource_file),
                 os.path.join(project_resource, resource_file)
+            )
+
+        for resource_icon in self.resource_icons:
+            shutil.copy2(
+                os.path.join(resources_icons_fs, resource_icon),
+                os.path.join(project_icons, resource_icon)
             )
 
     def copy_templates_files(self):
@@ -147,7 +161,9 @@ class StartProject:
     def make_resources_dir(self):
 
         resources_path = os.path.join(self.__main_path, 'resources')
+        resources_icons = os.path.join(resources_path, 'icons')
         os.mkdir(resources_path)
+        os.mkdir(resources_icons)
 
 
 class StartApp:
