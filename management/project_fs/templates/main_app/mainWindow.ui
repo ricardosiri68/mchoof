@@ -20,7 +20,7 @@
    <string>Main Window</string>
   </property>
   <property name="windowIcon">
-   <iconset>
+   <iconset resource="../../resource.qrc">
     <normaloff>:/app/appicon</normaloff>:/app/appicon</iconset>
   </property>
   <property name="styleSheet">
