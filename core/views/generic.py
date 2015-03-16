@@ -153,16 +153,6 @@ class ModalView(BaseView, QtGui.QDialog):
 
         self.setEnabled(True)
 
-        self.buttonBox.connect(
-            SIGNAL('accepted()'),
-            self.accept
-        )
-
-        self.buttonBox.connect(
-            SIGNAL('rejected()'),
-            self.reject
-        )
-
     def done(self, success):
 
         self.parent().setEnabled(True)

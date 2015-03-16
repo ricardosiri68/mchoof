@@ -77,14 +77,6 @@ class TableModelConfig(ConfParser):
         if not header and field_element.hasAttribute('header'):
             raise exceptions.ModelConfigHeaderError(self.model, field_element)
 
-        if not align and field_element.hasAttribute('align'):
-            raise exceptions.ModelConfigAlingError(self.model, field_element)
-
-        if not align in self.aligments_mapping.keys():
-            raise exceptions.ModelConfigAlignValueError(
-                self.model,
-                field_element
-            )
 
         index_column = self.fieldnames.index(name)
 
@@ -113,4 +105,19 @@ class TableModelConfig(ConfParser):
             self.model.foregrounds[index_column] = QBrush(QColor(*colortuple))
 
         self.model.headers[index_column] = header
-        self.model.aligments[index_column] = self.aligments_mapping[align]
+
+        if field_element.hasAttribute('align'):
+
+            if not align:
+                raise exceptions.ModelConfigAlingError(
+                    self.model,
+                    field_element
+                )
+
+            if not align in self.aligments_mapping.keys():
+                raise exceptions.ModelConfigAlignValueError(
+                    self.model,
+                    field_element
+                )
+
+            self.model.aligments[index_column] = self.aligments_mapping[align]

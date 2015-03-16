@@ -1,4 +1,5 @@
 from PySide.QtCore import QAbstractTableModel, Qt, QModelIndex
+from PySide.QtGui import QBrush, QPixmap
 from mchoof.core import db_session
 from mchoof.core.models import exceptions
 from mchoof.core.models.query_methods import QueryMethod
@@ -14,6 +15,10 @@ class TableModel(QAbstractTableModel):
     session = session
     model_config = None
     filters_list = {}
+    bool_decoration = {
+        False: QPixmap(':/crud/bullet-red'),
+        True: QPixmap(':/crud/bullet-green')
+    }
 
     def __init__(self, parent=None):
 
@@ -45,7 +50,10 @@ class TableModel(QAbstractTableModel):
     def data_display(self, index):
 
         keys = self.schema.__table__.columns.keys()
-        return getattr(self.records[index.row()], keys[index.column()])
+        data = getattr(self.records[index.row()], keys[index.column()])
+
+        if isinstance(data, (str, unicode, int, float, long)):
+            return data
 
     def data_edit(self, index):
 
@@ -62,12 +70,21 @@ class TableModel(QAbstractTableModel):
     def data_foreground(self, index):
         return self.foregrounds[index.column()]
 
+    def data_decoration(self, index):
+
+        keys = self.schema.__table__.columns.keys()
+        data = getattr(self.records[index.row()], keys[index.column()])
+
+        if isinstance(data, bool):
+            return self.bool_decoration[data]
+
     data_methods = {
         Qt.DisplayRole: data_display,
         Qt.EditRole: data_edit,
         Qt.TextAlignmentRole: data_textalign,
         Qt.BackgroundRole: data_background,
-        Qt.ForegroundRole: data_foreground
+        Qt.ForegroundRole: data_foreground,
+        Qt.DecorationRole: data_decoration
     }
 
     def setData(self, index, value, role=Qt.EditRole):
@@ -156,12 +173,6 @@ class TableModel(QAbstractTableModel):
         self.beginRemoveRows(index.parent(), index.row(), index.row())
         self.session.delete(self.records.pop(index.row()))
         self.endRemoveRows()
-
-        # print self.removeRow(index.row())
-        # self.dataChanged.emit(
-        #     self.index(index.row() - 1, 0),
-        #     self.index(0, 0)
-        # )
 
     def commit(self, refresh=True):
 
