@@ -1,5 +1,5 @@
 from PySide.QtCore import QAbstractTableModel, Qt, QModelIndex
-from PySide.QtGui import QBrush, QPixmap
+from PySide.QtGui import QPixmap
 from mchoof.core import db_session
 from mchoof.core.models import exceptions
 from mchoof.core.models.query_methods import QueryMethod
