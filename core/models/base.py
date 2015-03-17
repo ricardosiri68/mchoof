@@ -25,7 +25,9 @@ class TableModel(QAbstractTableModel):
         super(TableModel, self).__init__(parent)
 
         self.headers = self.schema.__table__.columns.keys()
-        self.aligments = len(self.headers) * [Qt.AlignLeft]
+        self.aligments = len(self.headers) * [
+            int(Qt.AlignVCenter | Qt.AlignLeft)
+        ]
         self.backgrounds = len(self.headers) * [None]
         self.foregrounds = len(self.headers) * [None]
 
@@ -57,7 +59,8 @@ class TableModel(QAbstractTableModel):
 
     def data_edit(self, index):
 
-        return self.data_display(index)
+        keys = self.schema.__table__.columns.keys()
+        return getattr(self.records[index.row()], keys[index.column()])
 
     def data_textalign(self, index):
 

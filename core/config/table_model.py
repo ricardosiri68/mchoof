@@ -77,7 +77,6 @@ class TableModelConfig(ConfParser):
         if not header and field_element.hasAttribute('header'):
             raise exceptions.ModelConfigHeaderError(self.model, field_element)
 
-
         index_column = self.fieldnames.index(name)
 
         if field_element.hasAttribute('background'):
@@ -120,4 +119,6 @@ class TableModelConfig(ConfParser):
                     field_element
                 )
 
-            self.model.aligments[index_column] = self.aligments_mapping[align]
+            self.model.aligments[index_column] = int(
+                Qt.AlignVCenter | self.aligments_mapping[align]
+            )
