@@ -1,9 +1,9 @@
 import os
 from PySide import QtGui
-from PySide.QtCore import QMetaObject, SIGNAL
+from PySide.QtCore import QMetaObject
 from PySide.QtUiTools import QUiLoader
 from mchoof.core.config import menubar, model_binding, contextual_menu,\
-    view_signals
+    view_signals, stylesheet
 from . import exceptions
 
 
@@ -118,6 +118,7 @@ class MainView(BaseView, QtGui.QMainWindow):
 
     main_widget = None
     menubar_conf = None
+    stylesheet_path = None
 
     def __init__(self, parent=None, main_app=None):
         QtGui.QMainWindow.__init__(self, parent)
@@ -132,6 +133,9 @@ class MainView(BaseView, QtGui.QMainWindow):
 
         if self.menubar_conf:
             menubar.MenuBarParser(self)
+
+        if self.stylesheet_path:
+            stylesheet.LoadStyleSheet(self)
 
     def actionExit(self):
         pass
