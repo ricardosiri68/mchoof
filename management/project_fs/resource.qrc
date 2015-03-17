@@ -1,5 +1,11 @@
 <RCC>
   <qresource prefix="crud">
+    <file alias="down-arrow-pressed">resources/icons/down-arrow-pressed.png</file>
+    <file alias="down-arrow-hover">resources/icons/down-arrow-hover.png</file>
+    <file alias="up-arrow-pressed">resources/icons/up-arrow-pressed.png</file>
+    <file alias="up-arrow-hover">resources/icons/up-arrow-hover.png</file>
+    <file alias="up-arrow">resources/icons/up-arrow.png</file>
+    <file alias="down-arrow">resources/icons/down-arrow.png</file>
     <file alias="add">resources/icons/add.png</file>
     <file alias="bullet-green">resources/icons/bullet-green.png</file>
     <file alias="bullet-red">resources/icons/bullet-red.png</file>
@@ -12,6 +18,7 @@
     <file alias="unchecked">resources/icons/unchecked.png</file>
   </qresource>
   <qresource prefix="app">
+    <file alias="background">resources/icons/bg.png</file>
     <file alias="appicon">resources/icons/icon.png</file>
   </qresource>
 </RCC>

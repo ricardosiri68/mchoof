@@ -58,9 +58,11 @@ class StartProject:
 
     resource_files = 'style.css',
     resource_icons = [
-        'add.png', 'bullet-green.png', 'bullet-red.png', 'checked.png',
-        'config.png', 'delete.png', 'edit.png', 'icon.png', 'save.png',
-        'seach.png', 'unchecked.png'
+        'add.png', 'bg.png', 'bullet-green.png', 'bullet-red.png',
+        'checked.png', 'config.png', 'delete.png', 'down-arrow-hover.png',
+        'down-arrow-pressed.png', 'down-arrow.png', 'edit.png', 'icon.png',
+        'save.png', 'seach.png', 'unchecked.png', 'up-arrow-hover.png',
+        'up-arrow-pressed.png', 'up-arrow.png'
     ]
     templates_files = 'mainFrame.ui', 'mainWindow.ui'
     database_dirs = 'migrations', 'initdata', 'extra', 'dumpschema'
