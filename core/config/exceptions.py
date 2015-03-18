@@ -130,6 +130,20 @@ class ModelBindingTableFieldnameError(XMLNodeException):
         super(ModelBindingTableFieldnameError, self).__init__(binding, message)
 
 
+class ModelBindingListDisplayFieldError(XMLNodeException):
+
+    def __init__(self, view, model, element):
+        message = 'The model binding of {model_classname} list on\
+            {view_classname} don\'t has a display field'.format(
+            model_classname=model.__class__.__name__,
+            view_classname=view.__class__.__name__
+        )
+        super(ModelBindingListDisplayFieldError, self).__init__(
+            element,
+            message
+        )
+
+
 class ModelBindingMapperAttributeError(XMLNodeException):
 
     def __init__(self, view, attribute_name, binding):
