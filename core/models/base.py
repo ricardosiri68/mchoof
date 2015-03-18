@@ -54,7 +54,11 @@ class TableModel(QAbstractTableModel):
         keys = self.schema.__table__.columns.keys()
         data = getattr(self.records[index.row()], keys[index.column()])
 
-        if isinstance(data, (str, unicode, int, float, long)):
+        if isinstance(data, bool):
+            return 'Si' if data else 'No'
+
+        else:
+
             return data
 
     def data_edit(self, index):
