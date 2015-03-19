@@ -60,6 +60,7 @@ class TableModelConfig(ConfParser):
         align = field_element.getAttribute('align')
         background = field_element.getAttribute('background')
         foreground = field_element.getAttribute('foreground')
+        relatedfield = field_element.getAttribute('relatedfield')
 
         if not name:
             raise exceptions.ModelConfigFieldnameError(
@@ -122,3 +123,10 @@ class TableModelConfig(ConfParser):
             self.model.aligments[index_column] = int(
                 Qt.AlignVCenter | self.aligments_mapping[align]
             )
+
+        if relatedfield:
+            self.setRelatedField(self.model, index_column, relatedfield)
+
+    def setRelatedField(self, model, index_column, relatedfield):
+
+        self.model.related_fields[index_column] = relatedfield.split(':')

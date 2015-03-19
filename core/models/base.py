@@ -19,6 +19,7 @@ class TableModel(QAbstractTableModel):
         False: QPixmap(':/crud/bullet-red'),
         True: QPixmap(':/crud/bullet-green')
     }
+    related_fields = {}
 
     def __init__(self, parent=None):
 
@@ -57,6 +58,12 @@ class TableModel(QAbstractTableModel):
         if isinstance(data, bool):
             return 'Si' if data else 'No'
 
+        elif isinstance(data, long) and index.column() in self.related_fields:
+
+            attribute, field = self.related_fields[index.column()]
+            record_attribute = getattr(self.records[index.row()], attribute)
+
+            return getattr(record_attribute, field)
         else:
 
             return data
@@ -192,3 +199,6 @@ class TableModel(QAbstractTableModel):
     def query(self):
 
         return self.objects
+
+    def get(self, pk):
+        return self.session.query(self.schema).get(id=pk)

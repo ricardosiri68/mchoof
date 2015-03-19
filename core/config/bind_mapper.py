@@ -49,6 +49,7 @@ class ModelBindMapperParser:
 
         inputname = mapping.getAttribute('input')
         fieldname = mapping.getAttribute('field')
+        delegate = mapping.getAttribute('delegate')
 
         if not inputname:
 
@@ -87,7 +88,12 @@ class ModelBindMapperParser:
             )
 
         widget = getattr(self.parent, inputname)
-        mapper.addMapping(widget, field_index)
+
+        if not delegate:
+            mapper.addMapping(widget, field_index)
+
+        else:
+            mapper.addDelegatedMapping(widget, field_index, delegate)
 
     def configMapper(self, mapper, element):
 

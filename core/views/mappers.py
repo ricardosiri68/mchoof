@@ -5,6 +5,8 @@ from PySide.QtGui import QDataWidgetMapper
 class MhDataMapper(QDataWidgetMapper):
 
     selector_view = None
+    delegations = {}
+    delegating = False
 
     def setSelectorView(self, selectorview):
 
@@ -49,6 +51,13 @@ class MhDataMapper(QDataWidgetMapper):
 
         self.setCurrentModelIndex(index)
 
+    def setCurrentModelIndex(self, index):
+
+        super(MhDataMapper, self).setCurrentModelIndex(index)
+
+        if self.delegations:
+            self.mapDelegations(index)
+
     def setModel(self, model):
 
         super(MhDataMapper, self).setModel(model)
@@ -64,9 +73,75 @@ class MhDataMapper(QDataWidgetMapper):
         )
 
     def rowInserted(self, parent, start, end):
-        index = self.model().index(start, 0)
+        index = self.model().index(start, 0, parent)
         self.setModelIndex(index)
 
     def rowRemoved(self, parent, start, end):
         index = self.model().sibling(start, 0, parent)
         self.setModelIndex(index)
+
+    def addDelegatedMapping(self, widget, field_index, delegation):
+
+        index_column = widget.model().get_field_index(delegation)
+
+        self.delegations[field_index] = (
+            delegation,
+            widget,
+            index_column
+        )
+
+        widget.currentIndexChanged.connect(
+            self.connectDelegatedData(widget, field_index, index_column)
+        )
+
+    def mapDelegations(self, index):
+
+        for field_index, (delegation, widget, columnindex) in\
+                self.delegations.items():
+
+            self.mapDelegation(index, field_index, delegation, widget)
+
+    def mapDelegation(self, index, field_index, delegation, widget):
+
+        model = self.model()
+        index = model.index(index.row(), field_index)
+        data = self.model().data_edit(index)
+
+        delegated_object = widget\
+            .model()\
+            .objects\
+            .filter_by(**{delegation: data})\
+            .one()
+
+        delegated_index = widget.model().get_index_by_object(delegated_object)
+
+        self.delegating = True
+        widget.setCurrentIndex(delegated_index.row())
+        self.delegating = False
+
+    def connectDelegatedData(self, widget, field_index, index_column):
+
+        def setDelegatedData(index):
+
+            if not self.delegating:
+
+                model = widget.model()
+
+                delegated_object = model.records[index]
+
+                row_index = self.currentIndex()
+
+                attribute = self.model().related_fields[field_index][0]
+
+                setattr(
+                    self.model().records[row_index],
+                    attribute,
+                    delegated_object
+                )
+
+                self.model().dataChanged.emit(
+                    self.model().index(row_index, field_index),
+                    self.model().index(row_index, field_index)
+                )
+
+        return setDelegatedData
