@@ -127,21 +127,13 @@ class MhDataMapper(QDataWidgetMapper):
 
                 model = widget.model()
 
-                delegated_object = model.records[index]
+                data = model.data_edit(model.index(index, index_column))
 
                 row_index = self.currentIndex()
 
-                attribute = self.model().related_fields[field_index][0]
-
-                setattr(
-                    self.model().records[row_index],
-                    attribute,
-                    delegated_object
-                )
-
-                self.model().dataChanged.emit(
+                self.model().setData(
                     self.model().index(row_index, field_index),
-                    self.model().index(row_index, field_index)
+                    data
                 )
 
         return setDelegatedData

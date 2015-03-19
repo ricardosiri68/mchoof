@@ -102,13 +102,28 @@ class TableModel(QAbstractTableModel):
     }
 
     def setData(self, index, value, role=Qt.EditRole):
+
+        record = self.records[index.row()]
+
         try:
 
             setattr(
-                self.records[index.row()],
+                record,
                 self.get_field_by_index(index.column()),
                 value
             )
+
+            if index.column() in self.related_fields:
+
+                attribute = self.related_fields[index.column()][0]
+
+                relation_attr = getattr(record, attribute)
+
+                new_relation_attr = self.session\
+                    .query(relation_attr.__class__)\
+                    .filter_by(id=value).one()
+
+                setattr(record, attribute, new_relation_attr)
 
             self.dataChanged.emit(index, index)
             return True

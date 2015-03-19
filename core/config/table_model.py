@@ -125,8 +125,35 @@ class TableModelConfig(ConfParser):
             )
 
         if relatedfield:
-            self.setRelatedField(self.model, index_column, relatedfield)
+            self.setRelatedField(
+                self.model,
+                index_column,
+                relatedfield,
+                field_element
+            )
 
-    def setRelatedField(self, model, index_column, relatedfield):
+    def setRelatedField(self, model, index_column, relatedfield, element):
 
-        self.model.related_fields[index_column] = relatedfield.split(':')
+        schema = self.model.schema()
+        try:
+            related_attr, field_attr = relatedfield.split(':')
+
+        except ValueError:
+            raise exceptions.ModelConfigRelatedFieldError(
+                self.model,
+                element
+            )
+
+        if not hasattr(schema, related_attr):
+            raise exceptions.ModelConfigRelatedAttributeError(
+                self.model,
+                related_attr,
+                element
+            )
+
+        self.model.related_fields[index_column] = (
+            related_attr,
+            field_attr
+        )
+
+        del schema

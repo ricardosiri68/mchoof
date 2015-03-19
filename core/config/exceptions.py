@@ -1,8 +1,12 @@
+import re
+
+
 class XMLNodeException(Exception):
 
     name_list = []
 
     def __init__(self, action, message):
+        message = re.sub('\s+', ' ', message)
         self.traceName(action)
         self.name_list.append(" >>> \n%s" % action.toprettyxml())
         error_message = '{message} on:\n {trace}'.format(
@@ -312,6 +316,30 @@ class ModelConfigHexColorError(XMLNodeException):
             model_classname=model.__class__.__name__
         )
         super(ModelConfigHexColorError, self).__init__(element, message)
+
+
+class ModelConfigRelatedFieldError(XMLNodeException):
+
+    def __init__(self, model, element):
+        message = 'The model config of {model_classname} has a invalid\
+            relatedfield attribute'.format(
+            model_classname=model.__class__.__name__
+        )
+        super(ModelConfigRelatedFieldError, self).__init__(element, message)
+
+
+class ModelConfigRelatedAttributeError(XMLNodeException):
+
+    def __init__(self, model, related_attr, element):
+        message = 'The model config of {model_classname} don\'t has a\
+            {related_attr} attribute on it\'s schema'.format(
+            model_classname=model.__class__.__name__,
+            related_attr=related_attr
+        )
+        super(ModelConfigRelatedAttributeError, self).__init__(
+            element,
+            message
+        )
 
 
 class SignalNameError(XMLNodeException):
