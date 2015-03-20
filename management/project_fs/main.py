@@ -1,6 +1,8 @@
+# -*- coding: utf-8 -*-
 import sys
 from mchoof.core.application import HoofApp
 from main_app import views
+import resource_rc
 
 
 if __name__ == '__main__':

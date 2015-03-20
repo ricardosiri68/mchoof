@@ -37,3 +37,11 @@ class AppPackageAlreadyExistError(Exception):
             project_path=project_path
         )
         super(AppPackageAlreadyExistError, self).__init__(message)
+
+
+class WrongPathForGenerateAlembicEnvError(Exception):
+
+    def __init__(self, path):
+        message = 'the path {path} is not a directory or doesn\'t exist'\
+            .format(path=path)
+        super(WrongPathForGenerateAlembicEnvError, self).__init__(message)

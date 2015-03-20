@@ -2,7 +2,8 @@ import os
 from PySide import QtGui
 from PySide.QtCore import QMetaObject
 from PySide.QtUiTools import QUiLoader
-from mchoof.core.config import menubar
+from mchoof.core.config import menubar, model_binding, contextual_menu,\
+    view_signals, stylesheet
 from . import exceptions
 
 
@@ -63,10 +64,28 @@ def loadUi(uifile, baseinstance=None):
     loader = UiLoader(baseinstance)
     widget = loader.load(uifile)
     QMetaObject.connectSlotsByName(widget)
-    return widget
+
+
+def modal_wrapper(modal=None):
+
+    def modal_decorator(func):
+
+        def modal_wrapper(parent):
+
+            modalinstance = modal(parent)
+            result = modalinstance.exec_()
+            func(parent, result)
+
+        return modal_wrapper
+
+    return modal_decorator
 
 
 class BaseView(object):
+
+    models_binding_conf = None
+    contextual_menus_conf = None
+    signals_conf = None
 
     def __init__(self):
 
@@ -75,11 +94,23 @@ class BaseView(object):
 
         loadUi(os.path.join('templates', self.template_name), self)
 
+        if self.models_binding_conf:
+            model_binding.ModelBindingParser(self)
 
-class View(BaseView, QtGui.QFrame):
+        if self.contextual_menus_conf:
+            contextual_menu.ContextMenuParser(self)
+
+        if self.signals_conf:
+            view_signals.SignalConfParser(self)
+
+    def showContextMenu(self, menu, widget):
+        return lambda point: menu.exec_(widget.mapToGlobal(point))
+
+
+class View(BaseView, QtGui.QWidget):
 
     def __init__(self, parent):
-        QtGui.QFrame.__init__(self, parent)
+        QtGui.QWidget.__init__(self, parent)
         BaseView.__init__(self)
 
 
@@ -87,6 +118,7 @@ class MainView(BaseView, QtGui.QMainWindow):
 
     main_widget = None
     menubar_conf = None
+    stylesheet_path = None
 
     def __init__(self, parent=None, main_app=None):
         QtGui.QMainWindow.__init__(self, parent)
@@ -102,15 +134,37 @@ class MainView(BaseView, QtGui.QMainWindow):
         if self.menubar_conf:
             menubar.MenuBarParser(self)
 
+        if self.stylesheet_path:
+            stylesheet.LoadStyleSheet(self)
+
     def actionExit(self):
         pass
 
     def loadPanelView(self, ViewClass):
+
         return lambda: self.setCentralWidget(ViewClass(self))
 
 
-class PanelView(BaseView, QtGui.QFrame):
+class ModalView(BaseView, QtGui.QDialog):
+
+    modal = True
 
     def __init__(self, parent):
-        QtGui.QFrame.__init__(self, parent)
+
+        QtGui.QDialog.__init__(self, parent)
+        parent.setEnabled(False)
         BaseView.__init__(self)
+
+        self.setEnabled(True)
+
+    def done(self, success):
+
+        self.parent().setEnabled(True)
+
+        super(ModalView, self).done(success)
+
+
+class PanelView(View):
+
+    def __init__(self, parent=None):
+        View.__init__(self, parent)
