@@ -4,6 +4,7 @@ from . import exceptions
 from .bind_mapper import ModelBindMapperParser
 from .bind_table import ModelBindTableParser
 from .bind_list import ModelBindListParser
+from .bind_tree import ModelBindTreeParser
 from .bind_filter import ModelBindFilterParser
 
 
@@ -21,6 +22,7 @@ class ModelBindingParser(ConfParser):
         self.mapper_parser = ModelBindMapperParser(self)
         self.table_parser = ModelBindTableParser(self)
         self.list_parser = ModelBindListParser(self)
+        self.tree_parser = ModelBindTreeParser(self)
         self.filter_parser = ModelBindFilterParser(self)
 
         self.bindModels()
@@ -62,7 +64,15 @@ class ModelBindingParser(ConfParser):
 
             querymethod()
 
-        self.table_parser.bindTables(model, binding.childNodes)
-        self.list_parser.bindLists(model, binding.childNodes)
-        self.mapper_parser.bindMappers(model, binding.childNodes)
-        self.filter_parser.bindFilters(model, binding.childNodes)
+            modelmro = [mro.__name__ for mro in model.__class__.__mro__]
+
+            if 'TableModel' in modelmro:
+
+                self.table_parser.bindTables(model, binding.childNodes)
+                self.list_parser.bindLists(model, binding.childNodes)
+                self.mapper_parser.bindMappers(model, binding.childNodes)
+                self.filter_parser.bindFilters(model, binding.childNodes)
+
+            elif 'TreeModel' in modelmro:
+
+                self.tree_parser.bindTrees(model, binding.childNodes)

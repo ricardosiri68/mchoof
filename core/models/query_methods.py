@@ -1,4 +1,5 @@
 from PySide.QtCore import QModelIndex
+from .tree_node import Node
 
 
 class QueryMethod:
@@ -8,7 +9,21 @@ class QueryMethod:
 
         def query_wrapper(*args, **kwargs):
             model = QueryMethod.before_wrapper(meth, args, kwargs)
+
             model.records = model.current_query['query'].all()
+
+            if 'TreeModel' in [mro.__name__ for mro in model.__class__.__mro__]:
+
+                model.records = model.current_query['query'].all()
+
+                for record in model.records:
+
+                    node = Node(record, model.rootNode)
+
+                    for childrecord in getattr(record, model.childnodes_attr):
+
+                        Node(childrecord, node)
+
             QueryMethod.after_wrapper(model)
 
             return model.records

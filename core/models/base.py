@@ -9,17 +9,44 @@ from mchoof.core.config.table_model import TableModelConfig
 session = db_session.get_session()
 
 
-class TableModel(QAbstractTableModel):
+class BaseModel(object):
 
     records = []
     session = session
     model_config = None
     filters_list = {}
+    related_fields = {}
+
+    def refresh(self):
+
+        getattr(
+            self,
+            self.current_query['method']
+        )(
+            *self.current_query['args'],
+            **self.current_query['kwargs']
+        )
+
+    def commit(self, refresh=True):
+
+        self.session.commit()
+
+        if refresh:
+            self.refresh()
+
+    @QueryMethod.all
+    def query(self):
+
+        return self.objects
+
+
+class TableModel(QAbstractTableModel, BaseModel):
+
+
     bool_decoration = {
         False: QPixmap(':/crud/bullet-red'),
         True: QPixmap(':/crud/bullet-green')
     }
-    related_fields = {}
 
     def __init__(self, parent=None):
 
@@ -29,6 +56,7 @@ class TableModel(QAbstractTableModel):
         self.aligments = len(self.headers) * [
             int(Qt.AlignVCenter | Qt.AlignLeft)
         ]
+
         self.backgrounds = len(self.headers) * [None]
         self.foregrounds = len(self.headers) * [None]
 
@@ -64,6 +92,7 @@ class TableModel(QAbstractTableModel):
             record_attribute = getattr(self.records[index.row()], attribute)
 
             return getattr(record_attribute, field)
+
         else:
 
             return data
@@ -101,6 +130,7 @@ class TableModel(QAbstractTableModel):
         Qt.DecorationRole: data_decoration
     }
 
+
     def setData(self, index, value, role=Qt.EditRole):
 
         record = self.records[index.row()]
@@ -133,20 +163,11 @@ class TableModel(QAbstractTableModel):
             raise exceptions.ModelSetDataError(self, index, value)
 
     def headerData(self, section, orientation, role=Qt.DisplayRole):
+
         if role == Qt.DisplayRole and orientation == Qt.Horizontal:
             return self.headers[section]
         else:
             super(TableModel, self).headerData(section, orientation, role)
-
-    def refresh(self):
-
-        getattr(
-            self,
-            self.current_query['method']
-        )(
-            *self.current_query['args'],
-            **self.current_query['kwargs']
-        )
 
     def get_field_index(self, fieldname):
 
@@ -202,18 +223,3 @@ class TableModel(QAbstractTableModel):
         self.beginRemoveRows(index.parent(), index.row(), index.row())
         self.session.delete(self.records.pop(index.row()))
         self.endRemoveRows()
-
-    def commit(self, refresh=True):
-
-        self.session.commit()
-
-        if refresh:
-            self.refresh()
-
-    @QueryMethod.all
-    def query(self):
-
-        return self.objects
-
-    def get(self, pk):
-        return self.session.query(self.schema).get(id=pk)

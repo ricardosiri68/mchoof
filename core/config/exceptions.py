@@ -266,6 +266,17 @@ class ModelBindingNonFilterMethodError(XMLNodeException):
         )
 
 
+class ModelBindingTreeViewError(XMLNodeException):
+
+    def __init__(self, view, attr_name, element):
+        message = 'The model binding {attr_name} tree of {view_classname} is\
+            not a instance of QTreeView'.format(
+            attr_name=attr_name,
+            view_classname=view.__class__.__name__
+        )
+        super(ModelBindingTreeViewError, self).__init__(element, message)
+
+
 class ModelConfigNameError(XMLNodeException):
 
     def __init__(self, model, element):
@@ -283,7 +294,7 @@ class ModelConfNotFound(Exception):
             model_config file'.format(
             model_classname=model.__class__.__name__
         )
-        super(ModelConfNotFound).__init__(message)
+        super(ModelConfNotFound, self).__init__(message)
 
 
 class ModelConfigFieldnameError(XMLNodeException):
@@ -340,6 +351,16 @@ class ModelConfigRelatedAttributeError(XMLNodeException):
             element,
             message
         )
+
+
+class ModelConfigNotChildNodeError(XMLNodeException):
+
+    def __init__(self, model, element):
+        message = 'The model config of {model_classname} don\'t has or has a\
+            wrong childnodes element'.format(
+            model_classname=model.__class__.__name__
+        )
+        super(ModelConfigNotChildNode, self).__init_(element, message)
 
 
 class SignalNameError(XMLNodeException):
