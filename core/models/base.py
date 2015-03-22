@@ -11,11 +11,51 @@ session = db_session.get_session()
 
 class BaseModel(object):
 
-    records = []
+    _records = []
     session = session
     model_config = None
     filters_list = {}
     related_fields = {}
+
+    def __init__(self):
+
+        self.data_methods = {
+            Qt.DisplayRole: self.data_display,
+            Qt.EditRole: self.data_edit,
+            Qt.TextAlignmentRole: self.data_textalign,
+            Qt.BackgroundRole: self.data_background,
+            Qt.ForegroundRole: self.data_foreground,
+            Qt.DecorationRole: self.data_decoration
+        }
+
+    def data(self, index, role=Qt.DisplayRole):
+
+        if role in self.data_methods:
+            return self.data_methods[role](index)
+
+    def data_display(self, index):
+
+        pass
+
+    def data_edit(self, index):
+
+        pass
+
+    def data_textalign(self, index):
+
+        pass
+
+    def data_background(self, index):
+
+        pass
+
+    def data_foreground(self, index):
+
+        pass
+
+    def data_decoration(self, index):
+
+        pass
 
     def refresh(self):
 
@@ -34,6 +74,14 @@ class BaseModel(object):
         if refresh:
             self.refresh()
 
+    @property
+    def records(self):
+        return self._records
+
+    @records.setter
+    def records(self, records):
+        self._records = records
+
     @QueryMethod.all
     def query(self):
 
@@ -42,7 +90,6 @@ class BaseModel(object):
 
 class TableModel(QAbstractTableModel, BaseModel):
 
-
     bool_decoration = {
         False: QPixmap(':/crud/bullet-red'),
         True: QPixmap(':/crud/bullet-green')
@@ -50,7 +97,8 @@ class TableModel(QAbstractTableModel, BaseModel):
 
     def __init__(self, parent=None):
 
-        super(TableModel, self).__init__(parent)
+        QAbstractTableModel.__init__(self, parent)
+        BaseModel.__init__(self)
 
         self.headers = self.schema.__table__.columns.keys()
         self.aligments = len(self.headers) * [
@@ -74,9 +122,7 @@ class TableModel(QAbstractTableModel, BaseModel):
         return len(self.records)
 
     def data(self, index, role=Qt.DisplayRole):
-
-        if role in self.data_methods:
-            return self.data_methods[role](self, index)
+        return BaseModel.data(self, index, role)
 
     def data_display(self, index):
 
@@ -120,16 +166,6 @@ class TableModel(QAbstractTableModel, BaseModel):
 
         if isinstance(data, bool):
             return self.bool_decoration[data]
-
-    data_methods = {
-        Qt.DisplayRole: data_display,
-        Qt.EditRole: data_edit,
-        Qt.TextAlignmentRole: data_textalign,
-        Qt.BackgroundRole: data_background,
-        Qt.ForegroundRole: data_foreground,
-        Qt.DecorationRole: data_decoration
-    }
-
 
     def setData(self, index, value, role=Qt.EditRole):
 

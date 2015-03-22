@@ -3,29 +3,6 @@ from .parser import ConfParser
 from . import exceptions
 
 
-class NodeConfig:
-
-    parent = None
-    name = None
-    columns = []
-
-    def __init__(self, name, parent):
-
-        self.name = name
-
-        if parent:
-            self.parent = parent
-
-    def addColumn(self, element):
-        pass
-
-    def name(self):
-        return self.name
-
-    def parent(self):
-        return self.parent
-
-
 class TreeModelConfig(ConfParser):
 
     model_element = None
