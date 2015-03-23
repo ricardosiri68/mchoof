@@ -1,13 +1,8 @@
 QMainWindow{
-    /* background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 rgba(53, 225, 87, 210), stop:0.994709 rgba(114, 168, 66, 255)); */
-    /* background-color: #004104; */
-    /* background-color:qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 rgba(0, 65, 4, 250), stop:0.994709 rgba(68, 99, 38, 240)); */
-    background-image: #888;
-    background-image: url(:/app/background) repeat;
+    background-image: url(':/app/background');
 }
 
 QDialog{
-    /* background-color:qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 rgba(0, 65, 4, 250), stop:0.994709 rgba(68, 99, 38, 240)); */
     background-color: #ccc;
 }
 
@@ -61,10 +56,16 @@ QGroupBox::title{
 QComboBox,
 QLineEdit,
 QDoubleSpinBox,
-QSpinBox{
+QSpinBox,
+QDateEdit,
+QTextEdit{
     padding: 5px;
     border: 1px solid #444;
     border-radius: 5px;
+}
+
+QTextEdit{
+    background-color: #fff;
 }
 
 QComboBox:focus,
@@ -78,8 +79,10 @@ QSpinBox:focus{
 QSpinBox::up-button,
 QDoubleSpinBox::up-button,
 QSpinBox::down-button,
-QDoubleSpinBox::down-buttom,
-QComboBox::drop-down{
+QDoubleSpinBox::down-button,
+QComboBox::drop-down,
+QDateEdit::down-button,
+QDateEdit::up-button{
     background-color: transparent;
 }
 
@@ -90,27 +93,32 @@ QComboBox::drop-down{
 
 QDoubleSpinBox::down-arrow,
 QSpinBox::down-arrow,
-QComboBox::down-arrow{
+QComboBox::down-arrow,
+QDateEdit::down-arrow{
     image: url(':/crud/down-arrow');
 }
 
 QSpinBox::up-arrow,
-QDoubleSpinBox::up-arrow{
+QDoubleSpinBox::up-arrow,
+QDateEdit::up-arrow{
     image: url(':/crud/up-arrow');
 }
 
 QSpinBox::up-arrow:hover,
-QDoubleSpinBox::up-arrow:hover{
+QDoubleSpinBox::up-arrow:hover,
+QDateEdit::up-arrow:hover{
     image: url(':/crud/up-arrow-hover');
 }
 
 QSpinBox::down-arrow:hover,
-QDoubleSpinBox::down-arrow:hover{
+QDoubleSpinBox::down-arrow:hover,
+QDateEdit::down-arrow:hover{
     image: url(':/crud/down-arrow-hover');
 }
 
 QSpinBox::up-arrow:pressed,
-QDoubleSpinBox::up-arrow:pressed{
+QDoubleSpinBox::up-arrow:pressed,
+QDateEdit::up-arrow:pressed{
     image: url(':/crud/up-arrow-pressed');
 }
 
@@ -164,11 +172,45 @@ QTableView{
     color: #333333;
     font-size: 14px;
 }
+
 QTableView:disabled{
     background-color:rgb(170, 170, 127);
 }
 
-QTableView QHeaderView::section{
+QTableView QHeaderView::section, QTreeView QHeaderView::section{
     background-color: #333333;
     color: #FFFFFF;
+}
+
+QTreeView{
+    alternate-background-color: #c0ccc0;
+    background-color: #e0eee0;
+}
+
+QTreeView::item{
+    border-right: 1px solid #bbb;
+}
+
+QTreeView::branch:has-siblings:!adjoins-item {
+    border-image: url(':/branch/vline') 0;
+}
+
+QTreeView::branch:has-siblings:adjoins-item {
+    border-image: url(':/branch/more') 0;
+}
+
+QTreeView::branch:!has-children:!has-siblings:adjoins-item {
+    border-image: url(':/branch/end') 0;
+}
+
+QTreeView::branch:has-children:!has-siblings:closed,
+QTreeView::branch:closed:has-children:has-siblings {
+        border-image: none;
+        image: url(':/branch/closed');
+}
+
+QTreeView::branch:open:has-children:!has-siblings,
+QTreeView::branch:open:has-children:has-siblings  {
+        border-image: none;
+        image: url(':/branch/open');
 }
