@@ -152,8 +152,9 @@ class ModalView(BaseView, QtGui.QDialog):
     def __init__(self, parent):
 
         QtGui.QDialog.__init__(self, parent)
-        parent.setEnabled(False)
         BaseView.__init__(self)
+
+        parent.setEnabled(False)
         self.setEnabled(True)
 
         parent = self.parent()
