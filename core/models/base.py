@@ -298,11 +298,9 @@ class TableModel(QAbstractTableModel, BaseModel):
     @property
     def related_fields(self):
 
-        if hasattr(self, '__related_fields'):
-            return self.__related_fields
-
-        return {}
+        return self._related_fields
 
     @related_fields.setter
     def related_fields(self, related_fields):
-        self.__related_fields = related_fields
+
+        self._related_fields = related_fields
