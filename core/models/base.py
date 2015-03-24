@@ -183,6 +183,7 @@ class TableModel(QAbstractTableModel, BaseModel):
 
         record = self.records[index.row()]
 
+        try:
 
             field_name = self.get_field_by_index(index.column())
 
