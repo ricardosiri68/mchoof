@@ -1,4 +1,6 @@
-from PySide.QtCore import QAbstractTableModel, Qt, QModelIndex
+from datetime import date
+from PySide.QtCore import QAbstractTableModel, Qt, QModelIndex, QDate,\
+    QDateTime
 from PySide.QtGui import QPixmap
 from mchoof.core import db_session
 from mchoof.core.models import exceptions
@@ -139,6 +141,10 @@ class TableModel(QAbstractTableModel, BaseModel):
 
             return getattr(record_attribute, field)
 
+        elif isinstance(data, date):
+
+            return '{:%d/%m/%Y}'.format(data)
+
         else:
 
             return data
@@ -146,7 +152,13 @@ class TableModel(QAbstractTableModel, BaseModel):
     def data_edit(self, index):
 
         keys = self.schema.__table__.columns.keys()
-        return getattr(self.records[index.row()], keys[index.column()])
+        data = getattr(self.records[index.row()], keys[index.column()])
+
+        if isinstance(data, date):
+            return QDate(data.year, data.month, data.day)
+
+        else:
+            return data
 
     def data_textalign(self, index):
 
@@ -171,11 +183,18 @@ class TableModel(QAbstractTableModel, BaseModel):
 
         record = self.records[index.row()]
 
-        try:
+
+            field_name = self.get_field_by_index(index.column())
+
+            if isinstance(value, QDateTime):
+                schema_field = getattr(record, field_name)
+
+                if isinstance(schema_field, date):
+                    value = value.toPython()
 
             setattr(
                 record,
-                self.get_field_by_index(index.column()),
+                field_name,
                 value
             )
 
