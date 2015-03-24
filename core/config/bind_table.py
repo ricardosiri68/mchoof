@@ -10,10 +10,13 @@ class ModelBindTableParser:
 
     def bindTables(self, model, childnodes):
         for element in childnodes:
+
             if element.nodeName == 'table':
+
                 self.bindTable(model, element)
 
     def bindTable(self, model, element):
+
         name = element.getAttribute('name')
 
         if not name:
