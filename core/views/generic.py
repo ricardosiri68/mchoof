@@ -116,6 +116,7 @@ class View(BaseView, QtGui.QWidget):
 
 class MainView(BaseView, QtGui.QMainWindow):
 
+    toolbar_widget = None
     main_widget = None
     menubar_conf = None
     stylesheet_path = None
@@ -136,6 +137,10 @@ class MainView(BaseView, QtGui.QMainWindow):
 
         if self.stylesheet_path:
             stylesheet.LoadStyleSheet(self)
+
+        if self.toolbar_widget and hasattr(self, 'toolBar'):
+            self.toolbar_view = self.toolbar_widget(self)
+            self.toolBar.addWidget(self.toolbar_view)
 
     def actionExit(self):
         pass
