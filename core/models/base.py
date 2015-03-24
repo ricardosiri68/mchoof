@@ -87,15 +87,12 @@ class BaseModel(object):
     @property
     def filters_list(self):
 
-        if hasattr(self, '__filters_list'):
-            return self.__filters_list
-
-        return {}
+        return self._filters_list
 
     @filters_list.setter
     def filters_list(self, filters_list):
 
-        self.__filters_list = filters_list
+        self._filters_list = filters_list
 
     @QueryMethod.all
     def query(self):
@@ -298,11 +295,9 @@ class TableModel(QAbstractTableModel, BaseModel):
     @property
     def related_fields(self):
 
-        if hasattr(self, '__related_fields'):
-            return self.__related_fields
-
-        return {}
+        return self._related_fields
 
     @related_fields.setter
     def related_fields(self, related_fields):
-        self.__related_fields = related_fields
+
+        self._related_fields = related_fields
