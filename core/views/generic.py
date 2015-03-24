@@ -154,8 +154,20 @@ class ModalView(BaseView, QtGui.QDialog):
         QtGui.QDialog.__init__(self, parent)
         parent.setEnabled(False)
         BaseView.__init__(self)
-
         self.setEnabled(True)
+
+        parent = self.parent()
+
+        self.centerModal(
+            parent.geometry().center().x(),
+            parent.geometry().center().y()
+        )
+
+    def centerModal(self, x, y):
+        self.move(
+            x - (self.geometry().center().x()),
+            y - (self.geometry().center().y())
+        )
 
     def done(self, success):
 
