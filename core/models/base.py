@@ -87,15 +87,12 @@ class BaseModel(object):
     @property
     def filters_list(self):
 
-        if hasattr(self, '__filters_list'):
-            return self.__filters_list
-
-        return {}
+        return self._filters_list
 
     @filters_list.setter
     def filters_list(self, filters_list):
 
-        self.__filters_list = filters_list
+        self._filters_list = filters_list
 
     @QueryMethod.all
     def query(self):
