@@ -16,10 +16,10 @@ class BaseModel(object):
     _records = []
     session = session
     model_config = None
-    filters_list = {}
-    related_fields = {}
 
     def __init__(self):
+
+        self._related_fields = {}
 
         self.data_methods = {
             Qt.DisplayRole: self.data_display,
@@ -83,6 +83,19 @@ class BaseModel(object):
     @records.setter
     def records(self, records):
         self._records = records
+
+    @property
+    def filters_list(self):
+
+        if hasattr(self, '__filters_list'):
+            return self.__filters_list
+
+        return {}
+
+    @filters_list.setter
+    def filters_list(self, filters_list):
+
+        self.__filters_list = filters_list
 
     @QueryMethod.all
     def query(self):
@@ -214,7 +227,8 @@ class TableModel(QAbstractTableModel, BaseModel):
             self.dataChanged.emit(index, index)
             return True
 
-        except AttributeError or IndexError:
+        except AttributeError or IndexError, e:
+            print e
 
             raise exceptions.ModelSetDataError(self, index, value)
 
@@ -246,6 +260,7 @@ class TableModel(QAbstractTableModel, BaseModel):
         self.beginInsertRows(index.parent(), index.row(), index.row())
 
         newobject = self.schema(**kwargs)
+
         self.session.add(newobject)
         self.records.insert(index.row(), newobject)
 
@@ -279,3 +294,15 @@ class TableModel(QAbstractTableModel, BaseModel):
         self.beginRemoveRows(index.parent(), index.row(), index.row())
         self.session.delete(self.records.pop(index.row()))
         self.endRemoveRows()
+
+    @property
+    def related_fields(self):
+
+        if hasattr(self, '__related_fields'):
+            return self.__related_fields
+
+        return {}
+
+    @related_fields.setter
+    def related_fields(self, related_fields):
+        self.__related_fields = related_fields
