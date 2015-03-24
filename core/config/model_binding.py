@@ -28,6 +28,7 @@ class ModelBindingParser(ConfParser):
         self.bindModels()
 
     def bindModels(self):
+
         for binding in self.rootNode().childNodes:
             if binding.nodeName == 'model':
                 self.bindModel(binding)
@@ -64,15 +65,15 @@ class ModelBindingParser(ConfParser):
 
             querymethod()
 
-            modelmro = [mro.__name__ for mro in model.__class__.__mro__]
+        modelmro = [mro.__name__ for mro in model.__class__.__mro__]
 
-            if 'TableModel' in modelmro:
+        if 'TableModel' in modelmro:
 
-                self.table_parser.bindTables(model, binding.childNodes)
-                self.list_parser.bindLists(model, binding.childNodes)
-                self.mapper_parser.bindMappers(model, binding.childNodes)
-                self.filter_parser.bindFilters(model, binding.childNodes)
+            self.table_parser.bindTables(model, binding.childNodes)
+            self.list_parser.bindLists(model, binding.childNodes)
+            self.mapper_parser.bindMappers(model, binding.childNodes)
+            self.filter_parser.bindFilters(model, binding.childNodes)
 
-            elif 'TreeModel' in modelmro:
+        elif 'TreeModel' in modelmro:
 
-                self.tree_parser.bindTrees(model, binding.childNodes)
+            self.tree_parser.bindTrees(model, binding.childNodes)
