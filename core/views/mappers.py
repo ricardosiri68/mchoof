@@ -5,8 +5,13 @@ from PySide.QtGui import QDataWidgetMapper
 class MhDataMapper(QDataWidgetMapper):
 
     selector_view = None
-    delegations = {}
-    delegating = False
+
+    def __init__(self, parent):
+
+        super(MhDataMapper, self).__init__(parent)
+
+        self.__delegations = {}
+        self.__delegating = False
 
     def setSelectorView(self, selectorview):
 
@@ -55,7 +60,7 @@ class MhDataMapper(QDataWidgetMapper):
 
         super(MhDataMapper, self).setCurrentModelIndex(index)
 
-        if self.delegations:
+        if self.__delegations:
             self.mapDelegations(index)
 
     def setModel(self, model):
@@ -84,7 +89,7 @@ class MhDataMapper(QDataWidgetMapper):
 
         index_column = widget.model().get_field_index(delegation)
 
-        self.delegations[field_index] = (
+        self.__delegations[field_index] = (
             delegation,
             widget,
             index_column
@@ -97,7 +102,7 @@ class MhDataMapper(QDataWidgetMapper):
     def mapDelegations(self, index):
 
         for field_index, (delegation, widget, columnindex) in\
-                self.delegations.items():
+                self.__delegations.items():
 
             self.mapDelegation(index, field_index, delegation, widget)
 

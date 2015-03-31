@@ -1,20 +1,23 @@
-from PySide.QtCore import QAbstractItemModel, Qt, QModelIndex
-from .base import session, BaseModel
+from PySide.QtCore import QAbstractItemModel, Qt, QModelIndex, QSize
+from .base import BaseModel
 from .tree_node import Node
 from mchoof.core.config.tree_model import TreeModelConfig
 
 
 class TreeModel(QAbstractItemModel, BaseModel):
 
-    records = []  # root_nodes
-    session = session
-    model_config = None
-    filter_list = {}
     childnodes_attr = None
     rootNode = Node()
+    first_col_size = QSize(10, 20)
+    rest_col_size = QSize(100, 20)
 
     def __init__(self, parent=None):
-        super(TreeModel, self).__init__(parent)
+        QAbstractItemModel.__init__(self, parent)
+        BaseModel.__init__(self)
+
+        self.data_methods.update({
+            Qt.SizeHintRole: self.data_size
+        })
 
         if self.model_config:
             TreeModelConfig(self)
@@ -38,9 +41,6 @@ class TreeModel(QAbstractItemModel, BaseModel):
 
         return parentNode.childCount()
 
-    def headerData(self, section, orientation, role):
-        return 'BZNGroup'
-
     def flags(self, index):
         return Qt.ItemIsEnabled | Qt.ItemIsSelectable
 
@@ -49,17 +49,35 @@ class TreeModel(QAbstractItemModel, BaseModel):
         if not index.isValid():
             return
 
-        node = index.internalPointer()
+        return BaseModel.data(self, index, role)
 
-        if role == Qt.DisplayRole:
+    def data_display(self, index):
+
+        if index.column():
+            node = index.internalPointer()
             record = node.record()
             keys = record.__table__.columns.keys()
 
-            try:
-                return getattr(record, keys[index.column()])
+            return getattr(record, keys[index.column()])
 
-            except IndexError:
-                pass
+    def data_edit(self, index):
+
+        node = index.internalPointer()
+        record = node.record()
+        keys = record.__table__.columns.keys()
+
+        return getattr(record, keys[index.column()])
+
+    def data_size(self, index):
+
+        return self.rest_col_size if index.column() else self.first_col_size
+
+    def headerData(self, section, orientation, role=Qt.DisplayRole):
+
+        if role == Qt.DisplayRole:
+
+            if section:
+                return "BZNHeader"
 
     def parent(self, index):
         node = index.internalPointer()
@@ -75,4 +93,26 @@ class TreeModel(QAbstractItemModel, BaseModel):
 
         child = parentNode.child(row)
 
-        return self.createIndex(row, column, child) if child else QModelIndex()
+        if child:
+            record = child.record()
+            keys = record.__table__.columns.keys()
+
+            return self.createIndex(row, column, child)\
+                if column < len(keys) else QModelIndex()
+
+        else:
+
+            return QModelIndex()
+
+    @BaseModel.records.setter
+    def records(self, records):
+
+        self._records = records
+
+        for record in self._records:
+
+            node = Node(record, self.rootNode)
+
+            for childrecord in getattr(record, self.childnodes_attr):
+
+                Node(childrecord, node)

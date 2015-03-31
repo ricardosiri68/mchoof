@@ -17,6 +17,13 @@
     <file alias="search">resources/icons/seach.png</file>
     <file alias="unchecked">resources/icons/unchecked.png</file>
   </qresource>
+  <qresource prefix="branch">
+    <file alias="vline">resources/icons/branch-vline.png</file>
+    <file alias="closed">resources/icons/branch-right-arrow.png</file>
+    <file alias="more">resources/icons/branch-more.png</file>
+    <file alias="end">resources/icons/branch-end.png</file>
+    <file alias="open">resources/icons/branch-down-arrow.png</file>
+  </qresource>
   <qresource prefix="app">
     <file alias="background">resources/icons/bg.png</file>
     <file alias="appicon">resources/icons/icon.png</file>

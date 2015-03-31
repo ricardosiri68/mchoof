@@ -1,4 +1,6 @@
-from PySide.QtCore import QAbstractTableModel, Qt, QModelIndex
+from datetime import date
+from PySide.QtCore import QAbstractTableModel, Qt, QModelIndex, QDate,\
+    QDateTime
 from PySide.QtGui import QPixmap
 from mchoof.core import db_session
 from mchoof.core.models import exceptions
@@ -11,11 +13,51 @@ session = db_session.get_session()
 
 class BaseModel(object):
 
-    records = []
+    _records = []
     session = session
     model_config = None
-    filters_list = {}
-    related_fields = {}
+
+    def __init__(self):
+
+        self._related_fields = {}
+
+        self.data_methods = {
+            Qt.DisplayRole: self.data_display,
+            Qt.EditRole: self.data_edit,
+            Qt.TextAlignmentRole: self.data_textalign,
+            Qt.BackgroundRole: self.data_background,
+            Qt.ForegroundRole: self.data_foreground,
+            Qt.DecorationRole: self.data_decoration
+        }
+
+    def data(self, index, role=Qt.DisplayRole):
+
+        if role in self.data_methods:
+            return self.data_methods[role](index)
+
+    def data_display(self, index):
+
+        pass
+
+    def data_edit(self, index):
+
+        pass
+
+    def data_textalign(self, index):
+
+        pass
+
+    def data_background(self, index):
+
+        pass
+
+    def data_foreground(self, index):
+
+        pass
+
+    def data_decoration(self, index):
+
+        pass
 
     def refresh(self):
 
@@ -34,6 +76,24 @@ class BaseModel(object):
         if refresh:
             self.refresh()
 
+    @property
+    def records(self):
+        return self._records
+
+    @records.setter
+    def records(self, records):
+        self._records = records
+
+    @property
+    def filters_list(self):
+
+        return self._filters_list
+
+    @filters_list.setter
+    def filters_list(self, filters_list):
+
+        self._filters_list = filters_list
+
     @QueryMethod.all
     def query(self):
 
@@ -42,7 +102,6 @@ class BaseModel(object):
 
 class TableModel(QAbstractTableModel, BaseModel):
 
-
     bool_decoration = {
         False: QPixmap(':/crud/bullet-red'),
         True: QPixmap(':/crud/bullet-green')
@@ -50,7 +109,8 @@ class TableModel(QAbstractTableModel, BaseModel):
 
     def __init__(self, parent=None):
 
-        super(TableModel, self).__init__(parent)
+        QAbstractTableModel.__init__(self, parent)
+        BaseModel.__init__(self)
 
         self.headers = self.schema.__table__.columns.keys()
         self.aligments = len(self.headers) * [
@@ -74,9 +134,7 @@ class TableModel(QAbstractTableModel, BaseModel):
         return len(self.records)
 
     def data(self, index, role=Qt.DisplayRole):
-
-        if role in self.data_methods:
-            return self.data_methods[role](self, index)
+        return BaseModel.data(self, index, role)
 
     def data_display(self, index):
 
@@ -93,6 +151,10 @@ class TableModel(QAbstractTableModel, BaseModel):
 
             return getattr(record_attribute, field)
 
+        elif isinstance(data, date):
+
+            return '{:%d/%m/%Y}'.format(data)
+
         else:
 
             return data
@@ -100,7 +162,13 @@ class TableModel(QAbstractTableModel, BaseModel):
     def data_edit(self, index):
 
         keys = self.schema.__table__.columns.keys()
-        return getattr(self.records[index.row()], keys[index.column()])
+        data = getattr(self.records[index.row()], keys[index.column()])
+
+        if isinstance(data, date):
+            return QDate(data.year, data.month, data.day)
+
+        else:
+            return data
 
     def data_textalign(self, index):
 
@@ -121,25 +189,23 @@ class TableModel(QAbstractTableModel, BaseModel):
         if isinstance(data, bool):
             return self.bool_decoration[data]
 
-    data_methods = {
-        Qt.DisplayRole: data_display,
-        Qt.EditRole: data_edit,
-        Qt.TextAlignmentRole: data_textalign,
-        Qt.BackgroundRole: data_background,
-        Qt.ForegroundRole: data_foreground,
-        Qt.DecorationRole: data_decoration
-    }
-
-
     def setData(self, index, value, role=Qt.EditRole):
 
         record = self.records[index.row()]
 
         try:
 
+            field_name = self.get_field_by_index(index.column())
+
+            if isinstance(value, QDateTime):
+                schema_field = getattr(record, field_name)
+
+                if isinstance(schema_field, date):
+                    value = value.toPython()
+
             setattr(
                 record,
-                self.get_field_by_index(index.column()),
+                field_name,
                 value
             )
 
@@ -158,7 +224,8 @@ class TableModel(QAbstractTableModel, BaseModel):
             self.dataChanged.emit(index, index)
             return True
 
-        except AttributeError or IndexError:
+        except AttributeError or IndexError, e:
+            print e
 
             raise exceptions.ModelSetDataError(self, index, value)
 
@@ -190,6 +257,7 @@ class TableModel(QAbstractTableModel, BaseModel):
         self.beginInsertRows(index.parent(), index.row(), index.row())
 
         newobject = self.schema(**kwargs)
+
         self.session.add(newobject)
         self.records.insert(index.row(), newobject)
 
@@ -223,3 +291,13 @@ class TableModel(QAbstractTableModel, BaseModel):
         self.beginRemoveRows(index.parent(), index.row(), index.row())
         self.session.delete(self.records.pop(index.row()))
         self.endRemoveRows()
+
+    @property
+    def related_fields(self):
+
+        return self._related_fields
+
+    @related_fields.setter
+    def related_fields(self, related_fields):
+
+        self._related_fields = related_fields

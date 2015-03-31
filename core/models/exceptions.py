@@ -24,7 +24,7 @@ class ModelSetDataError(Exception):
 
     def __init__(self, model, index, value):
 
-        message = 'The model {model_classnaame} can\'t set the value {value}\
+        message = 'The model {model_classname} can\'t set the value {value}\
         on the index {row}:{column}'.format(
             model_classname=model.__class__.__name__,
             value=value,

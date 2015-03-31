@@ -116,6 +116,7 @@ class View(BaseView, QtGui.QWidget):
 
 class MainView(BaseView, QtGui.QMainWindow):
 
+    toolbar_widget = None
     main_widget = None
     menubar_conf = None
     stylesheet_path = None
@@ -137,6 +138,10 @@ class MainView(BaseView, QtGui.QMainWindow):
         if self.stylesheet_path:
             stylesheet.LoadStyleSheet(self)
 
+        if self.toolbar_widget and hasattr(self, 'toolBar'):
+            self.toolbar_view = self.toolbar_widget(self)
+            self.toolBar.addWidget(self.toolbar_view)
+
     def actionExit(self):
         pass
 
@@ -152,10 +157,23 @@ class ModalView(BaseView, QtGui.QDialog):
     def __init__(self, parent):
 
         QtGui.QDialog.__init__(self, parent)
-        parent.setEnabled(False)
         BaseView.__init__(self)
 
+        parent.setEnabled(False)
         self.setEnabled(True)
+
+        parent = self.parent()
+
+        self.centerModal(
+            parent.geometry().center().x(),
+            parent.geometry().center().y()
+        )
+
+    def centerModal(self, x, y):
+        self.move(
+            x - (self.geometry().center().x()),
+            y - (self.geometry().center().y())
+        )
 
     def done(self, success):
 

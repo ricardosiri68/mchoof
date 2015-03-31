@@ -34,3 +34,17 @@ class ModelBindTreeParser:
             )
 
         treeview.setModel(model)
+        treeview.setColumnWidth(0, 50)
+        self.configColumns(model, treeview, element.childNodes)
+
+    def configColumns(self, model, treeview, childnodes):
+
+        for element in childnodes:
+            if element.nodeName == 'column':
+                self.configColumn(model, treeview, element)
+
+    def configColumn(self, model, treeview, column_element):
+
+        name = column_element.getAttribute('name')
+        width = column_element.getAttribute('width')
+        hidden = column_element.getAttribute('hidden')
