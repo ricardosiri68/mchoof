@@ -44,6 +44,7 @@ class MenuBarParser(ConfParser):
     def bindMenu(self, format_name, parentMenu, action):
         name = action.getAttribute('name').capitalize()
         title = action.getAttribute('title')
+        disabled = action.hasAttribute('disabled')
 
         if not name:
             raise exceptions.MenuNameError(action)
@@ -52,6 +53,9 @@ class MenuBarParser(ConfParser):
             raise exceptions.MenuTitleError(action)
 
         menu = parentMenu.addMenu(title)
+
+        if disabled:
+            menu.setEnabled(False)
 
         setattr(
             parentMenu,

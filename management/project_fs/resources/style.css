@@ -2,6 +2,10 @@ QMainWindow{
     background-image: url(':/app/background');
 }
 
+QToolBar{
+    padding: 5px 0;
+}
+
 QDialog{
     background-color: #ccc;
 }
@@ -44,6 +48,10 @@ QMenu{
     padding: 8px;
 }
 
+QMenuBar::item:!enabled{
+    color: #333;
+}
+
 QGroupBox::title{
     margin: 0px;
     border: .5px solid #D14836;
@@ -64,6 +72,24 @@ QTextEdit{
     border-radius: 5px;
 }
 
+QToolButton{
+    padding: 5px;
+    background-color: rgb(215, 61, 50);
+    border: 1px solid rgb(200, 46, 35);
+    border-radius: 5px;
+    color: #eee;
+}
+
+QToolButton:hover{
+    background-color: rgb(205, 51, 40);
+    color: #aaa;
+}
+
+QToolButton:disabled{
+    background-color: rgb(235, 81, 70);
+    color: #888;
+}
+
 QTextEdit{
     background-color: #fff;
 }
@@ -81,12 +107,14 @@ QDoubleSpinBox::up-button,
 QSpinBox::down-button,
 QDoubleSpinBox::down-button,
 QComboBox::drop-down,
+QDateEdit::drop-down,
 QDateEdit::down-button,
 QDateEdit::up-button{
     background-color: transparent;
 }
 
-QComboBox::drop-down{
+QComboBox::drop-down,
+QDateEdit::drop-down{
     border-left: 1px solid #444;
     padding: 0 3px;
 }
@@ -143,7 +171,7 @@ QPlainTextEdit{
 
 
 QPushButton{
-    background-color:qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgb(255, 255, 255), stop:0.0285714 rgb(104, 145, 231), stop:1 rgb(48, 78, 166));
+    background-color: rgb(48, 78, 166);
     color: #eee;
     border: 1px solid rgba(48, 78, 166, 75);
     border-radius: 5px;
@@ -152,13 +180,17 @@ QPushButton{
 }
 
 QGroupBox::title:disabled{
-    border-color:  #000;
-    background-color: #000
+    background-color: rgba(236, 90, 72);
 }
 
 QPushButton:hover{
-    background-color: rgb(48, 78, 166, 125);
+    background-color: rgb(38, 68, 156);
     color: #666;
+}
+
+QPushButton:disabled{
+    background-color: rgb(68, 98, 186);
+    color: #444;
 }
 
 QListView{
