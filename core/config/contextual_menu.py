@@ -26,6 +26,7 @@ class ContextMenuParser(ConfParser):
     def bindContextualMenu(self, menu_element):
         name = menu_element.getAttribute('name')
         widgetname = menu_element.getAttribute('widget')
+        onshow = menu_element.getAttribute('onshow')
 
         if not name:
             raise exceptions.MenuNameError(menu_element)
@@ -50,6 +51,29 @@ class ContextMenuParser(ConfParser):
             SIGNAL("customContextMenuRequested(QPoint)"),
             self.parent.showContextMenu(menu, widget)
         )
+
+        if onshow:
+            if hasattr(self.parent, onshow):
+                onshow_method = getattr(self.parent, onshow)
+
+                if callable(onshow_method):
+
+                    menu.aboutToShow.connect(onshow_method)
+
+                else:
+
+                    raise exceptions.ViewTargetNotCallableError(
+                        self.parent,
+                        onshow,
+                        menu_element
+                    )
+            else:
+                raise exceptions.ViewAttributeError(
+                    self.parent,
+                    onshow,
+                    menu_element
+                )
+
         self.bindChildItems(menu, menu_element.childNodes)
 
     def bindChildItems(self, menu, childnodes):
@@ -81,6 +105,7 @@ class ContextMenuParser(ConfParser):
         shortcut = action_element.getAttribute('shortcut')
         title = action_element.getAttribute('title')
         icon = action_element.getAttribute('icon')
+        disabled = action_element.hasAttribute('disabled')
 
         if not name:
             raise exceptions.MenuNameError(action_element)
@@ -99,7 +124,7 @@ class ContextMenuParser(ConfParser):
             )
 
         action = menu.addAction(title)
-        setattr(menu, 'action%s' % name, action)
+        setattr(menu, 'action%s' % name.capitalize(), action)
         attr_target = getattr(self.parent, target)
         action.connect(
             SIGNAL('triggered()'),
@@ -114,18 +139,25 @@ class ContextMenuParser(ConfParser):
 
         else:
             try:
+
                 keysequence = QKeySequence(self.getKeySecuence(shortcut))
-                QShortcut(keysequence, self.parent).connect(
+                shortcut_attr = QShortcut(keysequence, self.parent)
+                shortcut_attr.connect(
                     SIGNAL('activated()'),
                     attr_target
                 )
+                shortcut_attr.setEnabled(not disabled)
                 action.setShortcut(keysequence)
+                setattr(action, 'actionShortcut', shortcut_attr)
+
             except AttributeError:
                 raise exceptions.MenuShortcutKeysecuenceError(
                     self.parent,
                     shortcut,
                     action_element
                 )
+
+        action.setEnabled(not disabled)
 
     def getKeySecuence(self, shortcut):
         secuence = shortcut.split("+")
