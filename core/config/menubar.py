@@ -54,14 +54,14 @@ class MenuBarParser(ConfParser):
 
         menu = parentMenu.addMenu(title)
 
-        if disabled:
-            menu.setEnabled(False)
-
         setattr(
             parentMenu,
             format_name % name,
             menu
         )
+
+        if disabled:
+            menu.setEnabled(False)
 
         return menu
 
@@ -80,6 +80,7 @@ class MenuBarParser(ConfParser):
         title = action.getAttribute('title')
         icon = action.getAttribute('icon')
         shortcut = action.getAttribute('shortcut')
+        disabled = action.hasAttribute('disabled')
 
         if not name:
             raise exceptions.MenuNameError(action)
@@ -130,6 +131,8 @@ class MenuBarParser(ConfParser):
                     shortcut,
                     action
                 )
+
+        actionMenu.setEnabled(not disabled)
 
     def getKeySecuence(self, shortcut):
         secuence = shortcut.split("+")
