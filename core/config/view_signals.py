@@ -56,7 +56,11 @@ class SignalConfParser(ConfParser):
                     signal_element
                 )
             else:
+
                 qobject = getattr(qobject, attr)
+
+                if callable(qobject):
+                    qobject = qobject()
 
         if not hasattr(self.parent, target):
             raise exceptions.SignalInvalidTargetError(
