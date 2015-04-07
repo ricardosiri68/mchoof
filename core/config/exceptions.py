@@ -71,6 +71,17 @@ class ViewAttributeError(XMLNodeException):
         super(ViewAttributeError, self).__init__(binding, message)
 
 
+class ViewTargetNotCallableError(XMLNodeException):
+
+    def __init__(self, view, attribute_name, binding):
+        message = 'The attribute {attribute_name} of de view {view_classname}\
+            is not callable'.format(
+            attribute_name=attribute_name,
+            view_classname=view.__class__.__name__
+        )
+        super(ViewTargetNotCallableError, self).__init__(binding, message)
+
+
 class ActionTargetError(XMLNodeException):
 
     def __init__(self, action):
