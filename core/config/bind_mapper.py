@@ -28,8 +28,9 @@ class ModelBindMapperParser:
                 element
             )
 
-        setattr(self.parent, name, MhDataMapper(self.parent))
-        mapper = getattr(self.parent, name)
+        mapper = MhDataMapper(self.parent)
+
+        setattr(self.parent, name, mapper)
         mapper.setModel(model)
 
         self.mapFields(mapper, element.childNodes)
@@ -98,7 +99,7 @@ class ModelBindMapperParser:
     def configMapper(self, mapper, element):
 
         selectorview = element.getAttribute('selectorview')
-        autosubmit = element.hasAttribute('autosubmit')
+        manualsubmit = element.hasAttribute('manualsubmit')
 
         commiter = element.getAttribute('commiter')
         accept = element.getAttribute('accept')
@@ -111,8 +112,8 @@ class ModelBindMapperParser:
         if element.hasAttribute('commiter') and (accept or reject or done):
             self.bindCommiter(mapper, commiter, accept, reject, done, element)
 
-        if autosubmit:
-            mapper.setSubmitPolicy(mapper.AutoSubmit)
+        if manualsubmit:
+            mapper.setSubmitPolicy(mapper.ManualSubmit)
 
     def bindSelectorView(self, mapper, selectorview, element):
 

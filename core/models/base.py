@@ -242,6 +242,7 @@ class TableModel(QAbstractTableModel, BaseModel):
             return self.schema.__table__.columns.keys().index(fieldname)
 
         except ValueError:
+
             raise exceptions.FieldDoesntExist(self.schema, fieldname)
 
     def get_field_by_index(self, index):
