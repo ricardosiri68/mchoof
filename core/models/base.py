@@ -13,6 +13,7 @@ session = db_session.get_session()
 
 class BaseModel(object):
 
+    current_query = {}
     _records = []
     session = session
     model_config = None
@@ -61,13 +62,14 @@ class BaseModel(object):
 
     def refresh(self):
 
-        getattr(
-            self,
-            self.current_query['method']
-        )(
-            *self.current_query['args'],
-            **self.current_query['kwargs']
-        )
+        if self.current_query:
+            getattr(
+                self,
+                self.current_query['method']
+            )(
+                *self.current_query['args'],
+                **self.current_query['kwargs']
+            )
 
     def commit(self, refresh=True):
 
@@ -250,6 +252,7 @@ class TableModel(QAbstractTableModel, BaseModel):
         return self.schema.__table__.columns.keys()[index]
 
     def get_index_by_object(self, obj):
+
         return self.index(self.records.index(obj), 0)
 
     def add(self, row, **kwargs):
