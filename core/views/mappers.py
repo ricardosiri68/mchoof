@@ -60,8 +60,9 @@ class MhDataMapper(QDataWidgetMapper):
 
         super(MhDataMapper, self).setCurrentModelIndex(index)
 
-        if self.__delegations:
-            self.mapDelegations(index)
+        if index.isValid():
+            if self.__delegations:
+                self.mapDelegations(index)
 
     def setModel(self, model):
 
@@ -110,7 +111,7 @@ class MhDataMapper(QDataWidgetMapper):
 
         model = self.model()
         index = model.index(index.row(), field_index)
-        data = self.model().data_edit(index)
+        data = model.data_edit(index)
 
         delegated_object = widget\
             .model()\
