@@ -10,5 +10,5 @@ def get_session():
 
     if app_settings.settings.DATABASE_URL:
         engine = create_engine(app_settings.settings.DATABASE_URL)
-        Session = sessionmaker(bind=engine)
+        Session = sessionmaker(bind=engine, autoflush=False)
         return Session()
