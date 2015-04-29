@@ -100,6 +100,7 @@ class ContextMenuParser(ConfParser):
         self.bindChildItems(submenu, menu_element.childNodes)
 
     def bindAction(self, menu, action_element):
+
         name = action_element.getAttribute('name')
         target = action_element.getAttribute('target')
         shortcut = action_element.getAttribute('shortcut')
@@ -137,7 +138,8 @@ class ContextMenuParser(ConfParser):
         if not shortcut and action_element.hasAttribute('shortcut'):
             raise exceptions.MenuShortcutError(action_element)
 
-        else:
+        elif shortcut:
+
             try:
 
                 keysequence = QKeySequence(self.getKeySecuence(shortcut))
@@ -151,6 +153,7 @@ class ContextMenuParser(ConfParser):
                 setattr(action, 'actionShortcut', shortcut_attr)
 
             except AttributeError:
+
                 raise exceptions.MenuShortcutKeysecuenceError(
                     self.parent,
                     shortcut,
