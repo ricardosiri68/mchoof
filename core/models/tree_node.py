@@ -31,7 +31,13 @@ class Node(object):
 
     def child(self, row):
 
-        return self.__childnodes[row]
+        try:
+
+            return self.__childnodes[row]
+
+        except IndexError:
+
+            pass
 
     def childCount(self):
 
