@@ -104,6 +104,7 @@ class BaseView(object):
             view_signals.SignalConfParser(self)
 
     def showContextMenu(self, menu, widget):
+
         return lambda point: menu.exec_(widget.mapToGlobal(point))
 
 
@@ -185,4 +186,5 @@ class ModalView(BaseView, QtGui.QDialog):
 class PanelView(View):
 
     def __init__(self, parent=None):
+
         View.__init__(self, parent)
