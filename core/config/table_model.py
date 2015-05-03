@@ -24,7 +24,6 @@ class TableModelConfig(ConfParser):
             model.model_config
         )
 
-        self.fieldnames = model.schema.__table__.columns.keys()
         self.model = model
 
         ConfParser.__init__(self, conf_path)
@@ -47,64 +46,105 @@ class TableModelConfig(ConfParser):
         if not self.model_element:
             raise exceptions.ModelConfNotFound(self.model)
 
+        self.appendFields()
         self.configFields()
 
+    def appendFields(self):
+
+        for childnode in self.model_element.childNodes:
+
+            if childnode.nodeName == 'append':
+
+                self.appendField(childnode)
+
+    def appendField(self, append_element):
+
+        SchemaClass = self.model.schema
+
+        name = append_element.getAttribute('name')
+
+        if not name:
+
+            raise exceptions.ModelConfigNameError(
+                self.model,
+                append_element
+            )
+
+        # if not hasattr(SchemaClass, name):
+
+        try:
+
+            getattr(SchemaClass, name)
+
+        except:
+
+            raise exceptions.ModelConfigFieldnameError(
+                self.model,
+                append_element
+            )
+
+        self.model.appends.append(name)
+
+        self.configField(append_element)
+
     def configFields(self):
+
         for childnode in self.model_element.childNodes:
             if childnode.nodeName == 'field':
                 self.configField(childnode)
 
     def configField(self, field_element):
+
         name = field_element.getAttribute('name')
-        header = field_element.getAttribute('header')
-        align = field_element.getAttribute('align')
-        background = field_element.getAttribute('background')
-        foreground = field_element.getAttribute('foreground')
-        relatedfield = field_element.getAttribute('relatedfield')
 
         if not name:
+
             raise exceptions.ModelConfigFieldnameError(
                 self.model,
                 field_element
             )
 
-        if not name in self.fieldnames:
+        if not name in self.model.field_keys:
+
             raise exceptions.ModelConfigNotHasFieldError(
                 self.model,
                 name,
                 field_element
             )
 
+        index_column = self.model.field_keys.index(name)
+
+        self.setHeader(field_element, index_column)
+        self.setAlign(field_element, index_column)
+        self.setBackground(field_element, index_column)
+        self.setForeground(field_element, index_column)
+        self.setRelatedField(field_element, index_column)
+
+    def setHeader(self, field_element, index_column):
+
+        header = field_element.getAttribute('header')
+
         if not header and field_element.hasAttribute('header'):
+
             raise exceptions.ModelConfigHeaderError(self.model, field_element)
 
-        index_column = self.fieldnames.index(name)
+        elif header:
 
-        if field_element.hasAttribute('background'):
-            try:
-                colortuple = utils.hex_to_rgb(background)
-            except ValueError:
-                raise exceptions.ModelConfigHexColorError(
-                    self.model,
-                    'background',
-                    background,
-                    field_element
-                )
-            self.model.backgrounds[index_column] = QBrush(QColor(*colortuple))
+            if field_element.nodeName == 'append':
 
-        if field_element.hasAttribute('foreground'):
-            try:
-                colortuple = utils.hex_to_rgb(foreground)
-            except ValueError:
-                raise exceptions.ModelConfigHexColorError(
-                    self.model,
-                    'foreground',
-                    foreground,
-                    field_element
-                )
-            self.model.foregrounds[index_column] = QBrush(QColor(*colortuple))
+                self.model.headers.append(header)
 
-        self.model.headers[index_column] = header
+            else:
+
+                self.model.headers[index_column] = header
+
+        if not header and self.field_element.nodeName == 'append':
+
+            self.models.headers.append(field_element.getAttibute('name'))
+
+    def setAlign(self, field_element, index_column):
+
+        align = field_element.getAttribute('align')
 
         if field_element.hasAttribute('align'):
 
@@ -120,35 +160,112 @@ class TableModelConfig(ConfParser):
                     field_element
                 )
 
-            self.model.aligments[index_column] = int(
+            alignament = int(
                 Qt.AlignVCenter | self.aligments_mapping[align]
             )
 
-        if relatedfield:
-            self.setRelatedField(
-                self.model,
-                index_column,
-                relatedfield,
-                field_element
-            )
+            if field_element.nodeName == 'append':
 
-    def setRelatedField(self, model, index_column, relatedfield, element):
+                self.model.aligments.append(alignament)
 
+            else:
+
+                self.model.aligments[index_column] = alignament
+
+        if not align and field_element.nodeName == 'append':
+
+            self.model.aligments.append(int(Qt.AlignVCenter | Qt.AlignLeft))
+
+    def setBackground(self, field_element, index_column):
+
+        background = field_element.getAttribute('background')
+
+        if field_element.hasAttribute('background'):
+
+            try:
+
+                colortuple = utils.hex_to_rgb(background)
+
+            except ValueError:
+
+                raise exceptions.ModelConfigHexColorError(
+                    self.model,
+                    'background',
+                    background,
+                    field_element
+                )
+
+            background_color = QBrush(QColor(*colortuple))
+
+            if field_element.nodeName == 'append':
+
+                print 'append background', background
+                self.model.backgrounds.append(background_color)
+
+            else:
+
+                self.model.backgrounds[index_column] = background_color
+
+        elif field_element.nodeName == 'append':
+
+            self.model.backgrounds.append(None)
+
+    def setForeground(self, field_element, index_column):
+
+        foreground = field_element.getAttribute('foreground')
+
+        if field_element.hasAttribute('foreground'):
+
+            try:
+
+                colortuple = utils.hex_to_rgb(foreground)
+
+            except ValueError:
+
+                raise exceptions.ModelConfigHexColorError(
+                    self.model,
+                    'foreground',
+                    foreground,
+                    field_element
+                )
+
+            foreground_color = QBrush(QColor(*colortuple))
+
+            if field_element.nodeName == 'append':
+
+                self.model.foregrounds.append(foreground_color)
+
+            else:
+
+                self.model.foregrounds[index_column] = foreground_color
+
+        elif field_element.nodeName == 'append':
+
+            self.model.foregrounds.append(None)
+
+    def setRelatedField(self, field_element, index_column):
+
+        relatedfield = field_element.getAttribute('relatedfield')
         schema = self.model.schema()
+
+        if not relatedfield:
+
+            return
+
         try:
             related_attr, field_attr = relatedfield.split(':')
 
         except ValueError:
             raise exceptions.ModelConfigRelatedFieldError(
                 self.model,
-                element
+                field_element
             )
 
         if not hasattr(schema, related_attr):
             raise exceptions.ModelConfigRelatedAttributeError(
                 self.model,
                 related_attr,
-                element
+                field_element
             )
 
         self.model.related_fields[index_column] = (

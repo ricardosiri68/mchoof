@@ -14,13 +14,13 @@ session = db_session.get_session()
 class BaseModel(object):
 
     current_query = {}
-    _records = []
     session = session
     model_config = None
 
     def __init__(self):
 
         self._related_fields = {}
+        self.__records = []
 
         self.data_methods = {
             Qt.DisplayRole: self.data_display,
@@ -34,6 +34,7 @@ class BaseModel(object):
     def data(self, index, role=Qt.DisplayRole):
 
         if role in self.data_methods:
+
             return self.data_methods[role](index)
 
     def data_display(self, index):
@@ -63,6 +64,7 @@ class BaseModel(object):
     def refresh(self):
 
         if self.current_query:
+
             getattr(
                 self,
                 self.current_query['method']
@@ -76,15 +78,16 @@ class BaseModel(object):
         self.session.commit()
 
         if refresh:
+
             self.refresh()
 
     @property
     def records(self):
-        return self._records
+        return self.__records
 
     @records.setter
     def records(self, records):
-        self._records = records
+        self.__records = records
 
     @property
     def filters_list(self):
@@ -114,7 +117,8 @@ class TableModel(QAbstractTableModel, BaseModel):
         QAbstractTableModel.__init__(self, parent)
         BaseModel.__init__(self)
 
-        self.headers = self.schema.__table__.columns.keys()
+        self.__appends = []
+        self.headers = self.field_keys
         self.aligments = len(self.headers) * [
             int(Qt.AlignVCenter | Qt.AlignLeft)
         ]
@@ -129,18 +133,19 @@ class TableModel(QAbstractTableModel, BaseModel):
 
     def columnCount(self, index=None):
 
-        return len(self.schema.__table__.columns)
+        return len(self.field_keys)
 
     def rowCount(self, index=None):
 
         return len(self.records)
 
     def data(self, index, role=Qt.DisplayRole):
+
         return BaseModel.data(self, index, role)
 
     def data_display(self, index):
 
-        keys = self.schema.__table__.columns.keys()
+        keys = self.field_keys
         data = getattr(self.records[index.row()], keys[index.column()])
 
         if isinstance(data, bool):
@@ -163,10 +168,12 @@ class TableModel(QAbstractTableModel, BaseModel):
 
     def data_edit(self, index):
 
-        keys = self.schema.__table__.columns.keys()
+        keys = self.field_keys
+
         data = getattr(self.records[index.row()], keys[index.column()])
 
         if isinstance(data, date):
+
             return QDate(data.year, data.month, data.day)
 
         else:
@@ -185,7 +192,7 @@ class TableModel(QAbstractTableModel, BaseModel):
 
     def data_decoration(self, index):
 
-        keys = self.schema.__table__.columns.keys()
+        keys = self.field_keys
         data = getattr(self.records[index.row()], keys[index.column()])
 
         if isinstance(data, bool):
@@ -241,7 +248,7 @@ class TableModel(QAbstractTableModel, BaseModel):
     def get_field_index(self, fieldname):
 
         try:
-            return self.schema.__table__.columns.keys().index(fieldname)
+            return self.field_keys.index(fieldname)
 
         except ValueError:
 
@@ -249,7 +256,7 @@ class TableModel(QAbstractTableModel, BaseModel):
 
     def get_field_by_index(self, index):
 
-        return self.schema.__table__.columns.keys()[index]
+        return self.field_keys[index]
 
     def get_index_by_object(self, obj):
 
@@ -269,16 +276,20 @@ class TableModel(QAbstractTableModel, BaseModel):
 
         return newobject
 
-    def save(self, index, **kwargs):
+    def save(self, row, **kwargs):
 
         try:
-            schema_obj = self.records[index]
+
+            schema_obj = self.records[row]
+
         except IndexError:
-            raise exceptions.ModelIndexError(self, index)
+
+            raise exceptions.ModelIndexError(self, row)
 
         for field, value in kwargs.items():
 
-            if not field in self.schema.__table__.columns.keys():
+            if not field in self.field_keys:
+
                 raise exceptions.FieldDoesntExist(self.schema, field)
 
             setattr(schema_obj, field, value)
@@ -305,3 +316,13 @@ class TableModel(QAbstractTableModel, BaseModel):
     def related_fields(self, related_fields):
 
         self._related_fields = related_fields
+
+    @property
+    def field_keys(self):
+
+        return self.schema.__table__.columns.keys() + self.appends
+
+    @property
+    def appends(self):
+
+        return self.__appends
