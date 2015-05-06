@@ -6,11 +6,13 @@ from .bind_table import ModelBindTableParser
 from .bind_list import ModelBindListParser
 from .bind_tree import ModelBindTreeParser
 from .bind_filter import ModelBindFilterParser
+from .bind_completer import ModelBindCompleterParser
 
 
 class ModelBindingParser(ConfParser):
 
     def __init__(self, parent):
+
         conf_path = os.path.join(
             parent.__class__.__module__.split('.')[0],
             'conf',
@@ -24,6 +26,7 @@ class ModelBindingParser(ConfParser):
         self.list_parser = ModelBindListParser(self)
         self.tree_parser = ModelBindTreeParser(self)
         self.filter_parser = ModelBindFilterParser(self)
+        self.completer_parser = ModelBindCompleterParser(self)
 
         self.bindModels()
 
@@ -34,6 +37,7 @@ class ModelBindingParser(ConfParser):
                 self.bindModel(binding)
 
     def bindModel(self, binding):
+
         name = binding.getAttribute('name')
 
         if not name:
@@ -73,6 +77,7 @@ class ModelBindingParser(ConfParser):
             self.list_parser.bindLists(model, binding.childNodes)
             self.mapper_parser.bindMappers(model, binding.childNodes)
             self.filter_parser.bindFilters(model, binding.childNodes)
+            self.completer_parser.bindCompleters(model, binding.childNodes)
 
         elif 'TreeModel' in modelmro:
 

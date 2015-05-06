@@ -1,4 +1,4 @@
-from PySide.QtCore import SIGNAL
+from mchoof.core.views.completer import MhColumnCompleterDelegate
 from . import exceptions
 
 
@@ -47,6 +47,7 @@ class ModelBindTableParser:
         name = field_element.getAttribute('name')
         hidden = field_element.hasAttribute('hidden')
         width = field_element.getAttribute('width')
+        delegatecompleter = field_element.getAttribute('delegatecompleter')
 
         if not name:
             raise exceptions.ModelBindingNameError(field_element)
@@ -84,4 +85,22 @@ class ModelBindTableParser:
                 horizontal_header.setResizeMode(
                     field_index,
                     horizontal_header.Stretch
+                )
+
+        if delegatecompleter:
+
+            if hasattr(table.parent(), delegatecompleter):
+
+                completer = getattr(table.parent(), delegatecompleter)
+
+                table.setItemDelegateForColumn(
+                    field_index,
+                    MhColumnCompleterDelegate(completer, table)
+                )
+
+            else:
+
+                raise exceptions.ViewAttributeError(
+                    table.parent(),
+                    delegatecompleter
                 )

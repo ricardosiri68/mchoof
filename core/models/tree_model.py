@@ -116,3 +116,21 @@ class TreeModel(QAbstractItemModel, BaseModel):
             for childrecord in getattr(record, self.childnodes_attr):
 
                 Node(childrecord, node)
+
+    def add(self, row, **kwargs):
+
+        index = self.index(row, 0)
+        self.beginInsertRows(index.parent(), index.row(), index.row())
+
+        newobject = self.schema(**kwargs)
+
+        self.session.add(newobject)
+        self.records.insert(index.row(), newobject)
+
+        self.endInsertRows()
+
+        return newobject
+
+    def delete(self):
+
+        pass
