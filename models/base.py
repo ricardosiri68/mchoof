@@ -2,10 +2,10 @@ from datetime import date
 from PySide.QtCore import QAbstractTableModel, Qt, QModelIndex, QDate,\
     QDateTime
 from PySide.QtGui import QPixmap
-from mchoof.core import db_session
-from mchoof.core.models import exceptions
-from mchoof.core.models.query_methods import QueryMethod
-from mchoof.core.config.table_model import TableModelConfig
+from mchoof import db_session
+from mchoof.models import exceptions
+from mchoof.models.query_methods import QueryMethod
+from mchoof.config.table_model import TableModelConfig
 
 
 session = db_session.get_session()
@@ -231,9 +231,11 @@ class TableModel(QAbstractTableModel, BaseModel):
                 setattr(record, attribute, new_relation_attr)
 
             self.dataChanged.emit(index, index)
+
             return True
 
         except AttributeError or IndexError, e:
+
             print e
 
             raise exceptions.ModelSetDataError(self, index, value)

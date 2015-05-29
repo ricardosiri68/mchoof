@@ -2,7 +2,18 @@ import os
 from PySide.QtCore import SIGNAL, Qt
 from PySide.QtGui import QMenu, QShortcut, QKeySequence, QIcon, QPixmap
 from .parser import ConfParser
-from . import exceptions
+from .exceptions.view_exceptions import (
+    ViewAttributeError,
+    ViewTargetNotCallableError
+)
+from .exceptions.menu_exceptions import (
+    MenuNameError,
+    MenuWidgetValueError,
+    MenuTitleError,
+    ActionTargetError,
+    MenuShortcutError,
+    MenuShortcutKeysecuenceError
+)
 
 
 class ContextMenuParser(ConfParser):
@@ -29,16 +40,16 @@ class ContextMenuParser(ConfParser):
         onshow = menu_element.getAttribute('onshow')
 
         if not name:
-            raise exceptions.MenuNameError(menu_element)
+            raise MenuNameError(menu_element)
 
         if not widgetname:
-            raise exceptions.MenuWidgetValueError(menu_element)
+            raise MenuWidgetValueError(menu_element)
 
         try:
             widget = getattr(self.parent, widgetname)
 
         except AttributeError:
-            raise exceptions.ViewAttributeError(
+            raise ViewAttributeError(
                 self.parent,
                 widgetname,
                 menu_element
@@ -62,13 +73,13 @@ class ContextMenuParser(ConfParser):
 
                 else:
 
-                    raise exceptions.ViewTargetNotCallableError(
+                    raise ViewTargetNotCallableError(
                         self.parent,
                         onshow,
                         menu_element
                     )
             else:
-                raise exceptions.ViewAttributeError(
+                raise ViewAttributeError(
                     self.parent,
                     onshow,
                     menu_element
@@ -90,10 +101,10 @@ class ContextMenuParser(ConfParser):
         title = menu_element.getAttribute('title')
 
         if not name:
-            raise exceptions.MenuNameError(menu_element)
+            raise MenuNameError(menu_element)
 
         if not title:
-            raise exceptions.MenuTitleError(menu_element)
+            raise MenuTitleError(menu_element)
 
         submenu = menu.addMenu(title)
         setattr(menu, 'menu%s' % name.capitalize(), submenu)
@@ -109,16 +120,16 @@ class ContextMenuParser(ConfParser):
         disabled = action_element.hasAttribute('disabled')
 
         if not name:
-            raise exceptions.MenuNameError(action_element)
+            raise MenuNameError(action_element)
 
         if not target:
-            raise exceptions.ActionTargetError(action_element)
+            raise ActionTargetError(action_element)
 
         if not title:
-            raise exceptions.MenuTitleError(action_element)
+            raise MenuTitleError(action_element)
 
         if not hasattr(self.parent, target):
-            raise exceptions.ViewAttributeError(
+            raise ViewAttributeError(
                 self.parent,
                 target,
                 action_element
@@ -136,7 +147,7 @@ class ContextMenuParser(ConfParser):
             action.setIcon(QIcon(QPixmap(icon)))
 
         if not shortcut and action_element.hasAttribute('shortcut'):
-            raise exceptions.MenuShortcutError(action_element)
+            raise MenuShortcutError(action_element)
 
         elif shortcut:
 
@@ -154,7 +165,7 @@ class ContextMenuParser(ConfParser):
 
             except AttributeError:
 
-                raise exceptions.MenuShortcutKeysecuenceError(
+                raise MenuShortcutKeysecuenceError(
                     self.parent,
                     shortcut,
                     action_element

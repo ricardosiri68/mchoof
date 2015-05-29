@@ -1,6 +1,9 @@
-from PySide.QtCore import SIGNAL
 from PySide.QtGui import QTreeView
-from . import exceptions
+from .exceptions.view_exceptions import ViewAttributeError
+from .exceptions.model_binding_exceptions import (
+    ModelBindingNameError,
+    ModelBindingTreeViewError
+)
 
 
 class ModelBindTreeParser:
@@ -19,15 +22,15 @@ class ModelBindTreeParser:
         name = element.getAttribute('name')
 
         if not name:
-            raise exceptions.ModelBindingNameError(element)
+            raise ModelBindingNameError(element)
 
         if not hasattr(self.parent, name):
-            raise exceptions.ViewAttributeError(self.parent, name, element)
+            raise ViewAttributeError(self.parent, name, element)
 
         treeview = getattr(self.parent, name)
 
         if not isinstance(treeview, QTreeView):
-            raise exceptions.ModelBindingTreeViewError(
+            raise ModelBindingTreeViewError(
                 self.parent,
                 name,
                 element

@@ -1,6 +1,11 @@
 import os
 from .parser import ConfParser
-from . import exceptions
+from .exceptions.model_config_exceptions import (
+    ModelConfigNameError,
+    ModelConfNotFound,
+    ModelConfigNotChildnodesError,
+    ModelConfigRelatedAttributeError,
+)
 
 
 class TreeModelConfig(ConfParser):
@@ -23,7 +28,7 @@ class TreeModelConfig(ConfParser):
                 name = model_element.getAttribute('name')
 
                 if not name:
-                    raise exceptions.ModelConfigNameError(
+                    raise ModelConfigNameError(
                         self.parent,
                         model_element
                     )
@@ -33,11 +38,23 @@ class TreeModelConfig(ConfParser):
                     break
 
         if not self.model_element:
-            raise exceptions.ModelConfNotFound(self.model)
+            raise ModelConfNotFound(self.model)
 
         self.configModel()
 
     def configModel(self):
+
+        try:
+
+            col_count = int(self.model_element.getAttribute('col_count'))
+
+        except ValueError:
+            pass
+
+        self.configColumns()
+        self.configChildnodes()
+
+    def configChildNodes(self):
 
         childnodes = None
         for element in self.model_element.childNodes:
@@ -45,7 +62,7 @@ class TreeModelConfig(ConfParser):
                 childnodes = element
 
         if not childnodes:
-            raise exceptions.ModelConfigNotChildnodesError(
+            raise ModelConfigNotChildnodesError(
                 self.model,
                 self.model_element
             )
@@ -53,13 +70,13 @@ class TreeModelConfig(ConfParser):
         childnodes_name = childnodes.getAttribute('name')
 
         if not childnodes_name:
-            raise exceptions.ModelConfigNotChildnodesError(
+            raise ModelConfigNotChildnodesError(
                 self.model,
                 self.model_element
             )
 
         if not hasattr(self.model.schema, childnodes_name):
-            raise exceptions.ModelConfigRelatedAttributeError(
+            raise ModelConfigRelatedAttributeError(
                 self.model,
                 childnodes_name,
                 self.model_element

@@ -1,6 +1,10 @@
 import os
 from .parser import ConfParser
-from . import exceptions
+from .exceptions.model_binding_exceptions import (
+    ModelBindingNameError,
+    ModelBindingViewAttributeError,
+    ModelQuerymethodError
+)
 from .bind_mapper import ModelBindMapperParser
 from .bind_table import ModelBindTableParser
 from .bind_list import ModelBindListParser
@@ -41,12 +45,12 @@ class ModelBindingParser(ConfParser):
         name = binding.getAttribute('name')
 
         if not name:
-            raise exceptions.ModelBindingNameError(binding)
+            raise ModelBindingNameError(binding)
 
         try:
             model = getattr(self.parent, name, binding)
         except AttributeError:
-            raise exceptions.ModelBindingViewAttributeError(
+            raise ModelBindingViewAttributeError(
                 self.parent,
                 name,
                 binding
@@ -60,7 +64,7 @@ class ModelBindingParser(ConfParser):
             try:
                 querymethod = getattr(model, querymethodname)
             except AttributeError:
-                raise exceptions.ModelQuerymethodError(
+                raise ModelQuerymethodError(
                     self.parent,
                     model,
                     querymethod,

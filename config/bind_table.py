@@ -1,14 +1,22 @@
 from mchoof.core.views.completer import MhColumnCompleterDelegate
-from . import exceptions
+from .exceptions.view_exceptions import ViewAttributeError
+from .exceptions.model_binding_exceptions import (
+    ModelBindingNameError,
+    ModelBindingViewAttributeError,
+    ModelBindingTableFieldnameError,
+    ModelBindingTableWidthFieldError
+)
 
 
 class ModelBindTableParser:
 
     def __init__(self, parser_parent):
+
         self.parser_parent = parser_parent
         self.parent = parser_parent.parent
 
     def bindTables(self, model, childnodes):
+
         for element in childnodes:
 
             if element.nodeName == 'table':
@@ -20,14 +28,14 @@ class ModelBindTableParser:
         name = element.getAttribute('name')
 
         if not name:
-            raise exceptions.ModelBindingNameError(element)
+            raise ModelBindingNameError(element)
 
         try:
             table = getattr(self.parent, name)
 
         except AttributeError:
 
-            raise exceptions.ModelBindingViewAttributeError(
+            raise ModelBindingViewAttributeError(
                 self.parent,
                 name,
                 element
@@ -50,12 +58,12 @@ class ModelBindTableParser:
         delegatecompleter = field_element.getAttribute('delegatecompleter')
 
         if not name:
-            raise exceptions.ModelBindingNameError(field_element)
+            raise ModelBindingNameError(field_element)
 
         try:
             field_index = model.get_field_index(name)
         except:
-            raise exceptions.ModelBindingTableFieldnameError(
+            raise ModelBindingTableFieldnameError(
                 self.parent,
                 model,
                 name,
@@ -71,7 +79,7 @@ class ModelBindTableParser:
                 try:
                     width = int(width)
                 except ValueError:
-                    raise exceptions.ModelBindingTableWidthFieldError(
+                    raise ModelBindingTableWidthFieldError(
                         self.parent,
                         name,
                         field_element
@@ -100,7 +108,7 @@ class ModelBindTableParser:
 
             else:
 
-                raise exceptions.ViewAttributeError(
+                raise ViewAttributeError(
                     table.parent(),
                     delegatecompleter
                 )

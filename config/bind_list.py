@@ -1,5 +1,9 @@
 from PySide.QtCore import SIGNAL
-from . import exceptions
+from .exceptions.view_exceptinos import ViewAttributeError
+from .exceptions.model_binding_exceptions import (
+    ModelBindingNameError,
+    ModelBindingListDisplayFieldError
+)
 
 
 class ModelBindListParser:
@@ -18,21 +22,19 @@ class ModelBindListParser:
         displayfield = element.getAttribute('displayfield')
 
         if not name:
-            raise exceptions.ModelBindingNameError(element)
+
+            raise ModelBindingNameError(element)
 
         if not displayfield:
-            raise exceptions.ModelBindingListDisplayFieldError(
+
+            raise ModelBindingListDisplayFieldError(
                 self.parent,
                 model,
                 element
             )
 
         if not hasattr(self.parent, name):
-            raise exceptions.ViewAttributeError(
-                self.parent,
-                name,
-                element
-            )
+            raise ViewAttributeError(self.parent, name, element)
 
         uilist = getattr(self.parent, name)
 
