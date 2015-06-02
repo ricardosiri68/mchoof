@@ -1,4 +1,4 @@
-from mchoof.core.views.completer import MhColumnCompleterDelegate
+from mchoof.views.completer import MhColumnCompleterDelegate
 from .exceptions.view_exceptions import ViewAttributeError
 from .exceptions.model_binding_exceptions import (
     ModelBindingNameError,

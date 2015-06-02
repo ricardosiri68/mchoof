@@ -2,7 +2,7 @@ from datetime import date
 from PySide.QtCore import QAbstractTableModel, Qt, QModelIndex, QDate,\
     QDateTime
 from PySide.QtGui import QPixmap
-from mchoof import db_session
+from mchoof.core import db_session
 from mchoof.models import exceptions
 from mchoof.models.query_methods import QueryMethod
 from mchoof.config.table_model import TableModelConfig

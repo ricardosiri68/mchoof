@@ -1,6 +1,6 @@
 from ..views.mappers import MhDataMapper
 from .exceptions.view_exceptions import ViewAttributeError
-from .excepions.model_binding_exceptions import (
+from .exceptions.model_binding_exceptions import (
     ModelBindingNameError,
     ModelBindingMapperAttributeError,
     ModelBindingViewAttributeError,

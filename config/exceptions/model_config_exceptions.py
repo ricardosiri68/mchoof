@@ -100,4 +100,21 @@ class ModelConfigNotChildNodeError(XMLNodeException):
             model_classname=model.__class__.__name__
         )
 
-        super(ModelConfigNotChildNode, self).__init_(element, message)
+        super(ModelConfigNotChildNodeError, self).__init_(element, message)
+
+
+class ModelConfigHeaderError(XMLNodeException):
+
+    def __init__(self, model,  element):
+
+        message = 'The model config header attribute is empty on\
+        {model_classname}'.format(model_classname=model.__class__.__name__)
+
+        super(ModelConfigHeaderError, self).__init__(element, message)
+
+
+class ModelConfigAlignError(XMLNodeException):
+
+    def __init__(self, model, element):
+
+        message = 'The model config align attribute is empty'

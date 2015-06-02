@@ -1,5 +1,4 @@
-from PySide.QtCore import SIGNAL
-from .exceptions.view_exceptinos import ViewAttributeError
+from .exceptions.view_exceptions import ViewAttributeError
 from .exceptions.model_binding_exceptions import (
     ModelBindingNameError,
     ModelBindingListDisplayFieldError
