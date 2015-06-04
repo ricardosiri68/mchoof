@@ -3,7 +3,7 @@ from .parser import ConfParser
 from .exceptions.model_config_exceptions import (
     ModelConfigNameError,
     ModelConfNotFound,
-    ModelConfigNotChildnodesError,
+    ModelConfigNotChildNodeError,
     ModelConfigRelatedAttributeError,
 )
 
@@ -34,10 +34,13 @@ class TreeModelConfig(ConfParser):
                     )
 
                 if name == self.model.__class__.__name__:
+
                     self.model_element = model_element
+
                     break
 
         if not self.model_element:
+
             raise ModelConfNotFound(self.model)
 
         self.configModel()
@@ -58,11 +61,14 @@ class TreeModelConfig(ConfParser):
 
         childnodes = None
         for element in self.model_element.childNodes:
+
             if element.nodeName == 'childnodes':
+
                 childnodes = element
 
         if not childnodes:
-            raise ModelConfigNotChildnodesError(
+
+            raise ModelConfigNotChildNodeError(
                 self.model,
                 self.model_element
             )
@@ -70,7 +76,8 @@ class TreeModelConfig(ConfParser):
         childnodes_name = childnodes.getAttribute('name')
 
         if not childnodes_name:
-            raise ModelConfigNotChildnodesError(
+
+            raise ModelConfigNotChildNodeError(
                 self.model,
                 self.model_element
             )
