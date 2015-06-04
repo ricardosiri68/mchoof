@@ -17,6 +17,7 @@ class ModelConfNotFound(Exception):
 
     def __init__(self, model):
 
+        # show the wrong file path on the message
         message = 'The model conf of {model_classname} is not setted on\
             model_config file'.format(
             model_classname=model.__class__.__name__
@@ -53,8 +54,7 @@ class ModelConfigHexColorError(XMLNodeException):
     def __init__(self, model, attrname, hexcolor, element):
 
         message = '{hexcolor} is not a valid hexadecimal notation color on the\
-            attribute {attrname} on {model_classname}'\
-            .format(
+            attribute {attrname} on {model_classname}'.format(
             hexcolor=hexcolor,
             attrname=attrname,
             model_classname=model.__class__.__name__
@@ -107,8 +107,10 @@ class ModelConfigHeaderError(XMLNodeException):
 
     def __init__(self, model,  element):
 
-        message = 'The model config header attribute is empty on\
-        {model_classname}'.format(model_classname=model.__class__.__name__)
+        message = 'The model config header attribute is empty\
+            {model_classname}'.format(
+            model_classname=model.__class__.__name__
+        )
 
         super(ModelConfigHeaderError, self).__init__(element, message)
 
@@ -117,4 +119,21 @@ class ModelConfigAlignError(XMLNodeException):
 
     def __init__(self, model, element):
 
-        message = 'The model config align attribute is empty'
+        message = 'The model config align attribute is empty \
+            {model_classname}'.format(
+            model_classname=model.__class__.__name__
+        )
+
+        super(ModelConfigAlignError, self).__init__(element, message)
+
+
+class ModelConfigAlignValueError(XMLNodeException):
+
+    def __init__(self, model, element):
+
+        message = 'The model config align value is wrong \
+            {model_classname}'.format(
+            model_classname=model.__class__.__name__
+        )
+
+        super(ModelConfigAlignValueError, self).__init__(element, message)

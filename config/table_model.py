@@ -9,7 +9,7 @@ from .exceptions.model_config_exceptions import (
     ModelConfigFieldnameError,
     ModelConfigNotHasFieldError,
     ModelConfigHeaderError,
-    ModelConfigAlingError,
+    ModelConfigAlignError,
     ModelConfigAlignValueError,
     ModelConfigHexColorError,
     ModelConfigRelatedFieldError,
@@ -47,7 +47,7 @@ class TableModelConfig(ConfParser):
 
                 if not name:
                     raise ModelConfigNameError(
-                        self.parent,
+                        self.model,
                         model_element
                     )
 
@@ -149,7 +149,7 @@ class TableModelConfig(ConfParser):
 
                 self.model.headers[index_column] = header
 
-        if not header and self.field_element.nodeName == 'append':
+        if not header and field_element.nodeName == 'append':
 
             self.models.headers.append(field_element.getAttibute('name'))
 
@@ -160,7 +160,7 @@ class TableModelConfig(ConfParser):
         if field_element.hasAttribute('align'):
 
             if not align:
-                raise ModelConfigAlingError(
+                raise ModelConfigAlignError(
                     self.model,
                     field_element
                 )
@@ -257,25 +257,39 @@ class TableModelConfig(ConfParser):
     def setRelatedField(self, field_element, index_column):
 
         relatedfield = field_element.getAttribute('relatedfield')
-        schema = self.model.schema()
 
         if not relatedfield:
 
             return
 
+        schema = self.model.schema()
+
         try:
+
             related_attr, field_attr = relatedfield.split(':')
 
         except ValueError:
+
             raise ModelConfigRelatedFieldError(
                 self.model,
                 field_element
             )
 
         if not hasattr(schema, related_attr):
+
             raise ModelConfigRelatedAttributeError(
                 self.model,
                 related_attr,
+                field_element
+            )
+
+        related = getattr(schema, related_attr)
+
+        if not hasattr(related, field_attr):
+
+            raise ModelConfigRelatedAttributeError(
+                self.model,
+                field_attr,
                 field_element
             )
 
