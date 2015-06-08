@@ -1,7 +1,14 @@
 import os
 from PySide.QtCore import SIGNAL
 from .parser import ConfParser
-from . import exceptions
+from .exceptions.view_exceptions import (
+    SignalNameError,
+    SignalTargetError,
+    SignalAttributeSenderNameError,
+    SignalAttributeSenderNonValueError,
+    SignalQObjectNonHasAttrError,
+    SignalInvalidTargetError
+)
 
 
 class SignalConfParser(ConfParser):
@@ -31,17 +38,17 @@ class SignalConfParser(ConfParser):
         attr = signal_element.getAttribute('attr')
 
         if not name:
-            raise exceptions.SignalNameError(self.parent, signal_element)
+            raise SignalNameError(self.parent, signal_element)
 
         if not target:
-            raise exceptions.SignalTargetError(self.parent, signal_element)
+            raise SignalTargetError(self.parent, signal_element)
 
         must_be_an_attr = (
             qobject is self.parent or
             signal_element.hasAttribute('attr')
         )
         if not attr and must_be_an_attr:
-            raise exceptions.SignalAttributeSenderNonValueError(
+            raise SignalAttributeSenderNonValueError(
                 self.parent,
                 qobject,
                 signal_element
@@ -49,7 +56,7 @@ class SignalConfParser(ConfParser):
 
         if attr:
             if not hasattr(qobject, attr):
-                raise exceptions.SignalQObjectNonHasAttrError(
+                raise SignalQObjectNonHasAttrError(
                     self.parent,
                     qobject,
                     attr,
@@ -63,7 +70,7 @@ class SignalConfParser(ConfParser):
                     qobject = qobject()
 
         if not hasattr(self.parent, target):
-            raise exceptions.SignalInvalidTargetError(
+            raise SignalInvalidTargetError(
                 self.parent,
                 target,
                 signal_element
@@ -78,13 +85,13 @@ class SignalConfParser(ConfParser):
         name = attr_element.getAttribute('name')
 
         if not name:
-            raise exceptions.SignalAttributeSenderNameError(
+            raise SignalAttributeSenderNameError(
                 self.parent,
                 attr_element
             )
 
         if not hasattr(self.parent, name):
-            raise exceptions.SignalQObjectNonHasAttrError(
+            raise SignalQObjectNonHasAttrError(
                 self.parent,
                 self.parent,
                 name,

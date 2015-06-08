@@ -1,20 +1,22 @@
 from PySide.QtCore import QAbstractItemModel, Qt, QModelIndex, QSize
 from .base import BaseModel
 from .tree_node import Node
-from mchoof.core.config.tree_model import TreeModelConfig
+from mchoof.config.tree_model import TreeModelConfig
 
 
 class TreeModel(QAbstractItemModel, BaseModel):
 
     childnodes_attr = None
-    rootNode = Node()
     first_col_size = QSize(10, 20)
     rest_col_size = QSize(100, 20)
+    column_count = 0
 
     def __init__(self, parent=None):
+
         QAbstractItemModel.__init__(self, parent)
         BaseModel.__init__(self)
 
+        self.rootNode = Node()
         self.data_methods.update({
             Qt.SizeHintRole: self.data_size
         })
@@ -42,6 +44,7 @@ class TreeModel(QAbstractItemModel, BaseModel):
         return parentNode.childCount()
 
     def flags(self, index):
+
         return Qt.ItemIsEnabled | Qt.ItemIsSelectable
 
     def data(self, index, role=Qt.DisplayRole):
@@ -54,6 +57,7 @@ class TreeModel(QAbstractItemModel, BaseModel):
     def data_display(self, index):
 
         if index.column():
+
             node = index.internalPointer()
             record = node.record()
             keys = record.__table__.columns.keys()
@@ -80,6 +84,7 @@ class TreeModel(QAbstractItemModel, BaseModel):
                 return "BZNHeader"
 
     def parent(self, index):
+
         node = index.internalPointer()
         parentNode = node.parent()
 
@@ -107,9 +112,10 @@ class TreeModel(QAbstractItemModel, BaseModel):
     @BaseModel.records.setter
     def records(self, records):
 
-        self._records = records
+        self.__records = records
+        self.rootNode.clearChilds()
 
-        for record in self._records:
+        for record in self.__records:
 
             node = Node(record, self.rootNode)
 

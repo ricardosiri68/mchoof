@@ -2,7 +2,7 @@ import os
 from PySide import QtGui
 from PySide.QtCore import QMetaObject
 from PySide.QtUiTools import QUiLoader
-from mchoof.core.config import menubar, model_binding, contextual_menu,\
+from mchoof.config import menubar, model_binding, contextual_menu,\
     view_signals, stylesheet
 from . import exceptions
 

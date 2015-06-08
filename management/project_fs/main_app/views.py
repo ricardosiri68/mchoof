@@ -1,4 +1,4 @@
-from mchoof.core.views import generic
+from mchoof.views import generic
 
 
 class MainFrame(generic.View):

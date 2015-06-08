@@ -1,6 +1,7 @@
 from PySide.QtCore import Qt
 from PySide.QtGui import QCompleter
-from . import exceptions
+from exceptions.model_binding_exceptions import ModelBindingNameError
+from exceptions.view_exceptions import NoCompletionFieldException
 
 
 class ModelBindCompleterParser:
@@ -27,25 +28,22 @@ class ModelBindCompleterParser:
 
         name = completer_element.getAttribute('name')
         completion_field = completer_element.getAttribute('completionfield')
-        on_new = completer_element.getAttribute('onnew')
+        # on_new = completer_element.getAttribute('onnew')
 
         if not name:
 
-            raise exceptions.ModelBindingNameError(completer_element)
+            raise ModelBindingNameError(completer_element)
 
         if not completion_field:
 
-            raise exceptions.NoCompletionFieldException(
-                self.parent,
-                completer_element
-            )
+            raise NoCompletionFieldException(self.parent, completer_element)
 
-        if completer_element.hasAttribute('onnew') and not on_new:
+        # if completer_element.hasAttribute('onnew') and not on_new:
 
-            raise exceptions.NoCompletionDataExeption(
-                self.parent,
-                completer_element
-            )
+        #     raise NoCompletionDataExeption(
+        #         self.parent,
+        #         completer_element
+        #     )
 
         completer = QCompleter(self.parent)
         setattr(self.parent, name, completer)

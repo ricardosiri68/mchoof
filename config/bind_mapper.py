@@ -1,5 +1,13 @@
 from ..views.mappers import MhDataMapper
-from . import exceptions
+from .exceptions.view_exceptions import ViewAttributeError
+from .exceptions.model_binding_exceptions import (
+    ModelBindingNameError,
+    ModelBindingMapperAttributeError,
+    ModelBindingViewAttributeError,
+    ModelBindingMappingFieldError,
+    ModelBindingMapperSelectorViewError,
+    ModelBindingMappingCommiterError
+)
 
 
 class ModelBindMapperParser:
@@ -18,11 +26,11 @@ class ModelBindMapperParser:
 
         if not name:
 
-            raise exceptions.ModelBindingNameError(element)
+            raise ModelBindingNameError(element)
 
         if hasattr(self. parent, name):
 
-            raise exceptions.ModelBindingMapperAttributeError(
+            raise ModelBindingMapperAttributeError(
                 self.parent,
                 name,
                 element
@@ -54,7 +62,7 @@ class ModelBindMapperParser:
 
         if not inputname:
 
-            raise exceptions.ModelBindingMapperAttributeError(
+            raise ModelBindingMapperAttributeError(
                 self.parent,
                 'input',
                 mapping
@@ -62,7 +70,7 @@ class ModelBindMapperParser:
 
         if not fieldname:
 
-            raise exceptions.ModelBindingMapperAttributeError(
+            raise ModelBindingMapperAttributeError(
                 self.parent,
                 'field',
                 mapping
@@ -70,7 +78,7 @@ class ModelBindMapperParser:
 
         if not hasattr(self.parent, inputname):
 
-            raise exceptions.ModelBindingViewAttributeError(
+            raise ModelBindingViewAttributeError(
                 self.parent,
                 inputname,
                 mapping
@@ -82,7 +90,7 @@ class ModelBindMapperParser:
 
         except:
 
-            raise exceptions.ModelBindingMappingFieldError(
+            raise ModelBindingMappingFieldError(
                 mapper,
                 fieldname,
                 mapping
@@ -118,10 +126,10 @@ class ModelBindMapperParser:
     def bindSelectorView(self, mapper, selectorview, element):
 
         if not selectorview:
-            raise exceptions.ModelBindingMapperSelectorViewError(element)
+            raise ModelBindingMapperSelectorViewError(element)
 
         if not hasattr(self.parent, selectorview):
-            raise exceptions.ModelBindingViewAttributeError(
+            raise ModelBindingViewAttributeError(
                 self.parent,
                 selectorview,
                 element
@@ -134,13 +142,13 @@ class ModelBindMapperParser:
 
         if not hasattr(self.parent, commiter):
 
-            raise exceptions.ViewAttributeError(self.parent, commiter, element)
+            raise ViewAttributeError(self.parent, commiter, element)
 
         commiter_attr = getattr(self.parent, commiter)
 
         if commiter_attr.__class__.__name__ != 'QDialogButtonBox':
 
-            raise exceptions.ModelBindingMappingCommiterError(
+            raise ModelBindingMappingCommiterError(
                 self.parent,
                 commiter,
                 element
@@ -164,7 +172,7 @@ class ModelBindMapperParser:
 
             else:
 
-                raise exceptions.ViewAttributeError(
+                raise ViewAttributeError(
                     self.parent,
                     value,
                     element

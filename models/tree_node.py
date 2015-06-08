@@ -21,6 +21,10 @@ class Node(object):
 
         return self.__childnodes
 
+    def clearChilds(self):
+
+        self.__childnodes = []
+
     def row(self):
 
         return self.parent().childnodes().index(self)

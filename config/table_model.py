@@ -3,7 +3,18 @@ from PySide.QtCore import Qt
 from PySide.QtGui import QBrush, QColor
 from mchoof.core import utils
 from .parser import ConfParser
-from . import exceptions
+from .exceptions.model_config_exceptions import (
+    ModelConfigNameError,
+    ModelConfNotFound,
+    ModelConfigFieldnameError,
+    ModelConfigNotHasFieldError,
+    ModelConfigHeaderError,
+    ModelConfigAlignError,
+    ModelConfigAlignValueError,
+    ModelConfigHexColorError,
+    ModelConfigRelatedFieldError,
+    ModelConfigRelatedAttributeError,
+)
 
 
 class TableModelConfig(ConfParser):
@@ -35,8 +46,8 @@ class TableModelConfig(ConfParser):
                 name = model_element.getAttribute('name')
 
                 if not name:
-                    raise exceptions.ModelConfigNameError(
-                        self.parent,
+                    raise ModelConfigNameError(
+                        self.model,
                         model_element
                     )
 
@@ -44,7 +55,7 @@ class TableModelConfig(ConfParser):
                     self.model_element = model_element
 
         if not self.model_element:
-            raise exceptions.ModelConfNotFound(self.model)
+            raise ModelConfNotFound(self.model)
 
         self.appendFields()
         self.configFields()
@@ -65,7 +76,7 @@ class TableModelConfig(ConfParser):
 
         if not name:
 
-            raise exceptions.ModelConfigNameError(
+            raise ModelConfigNameError(
                 self.model,
                 append_element
             )
@@ -78,7 +89,7 @@ class TableModelConfig(ConfParser):
 
         except:
 
-            raise exceptions.ModelConfigFieldnameError(
+            raise ModelConfigFieldnameError(
                 self.model,
                 append_element
             )
@@ -99,14 +110,14 @@ class TableModelConfig(ConfParser):
 
         if not name:
 
-            raise exceptions.ModelConfigFieldnameError(
+            raise ModelConfigFieldnameError(
                 self.model,
                 field_element
             )
 
         if not name in self.model.field_keys:
 
-            raise exceptions.ModelConfigNotHasFieldError(
+            raise ModelConfigNotHasFieldError(
                 self.model,
                 name,
                 field_element
@@ -126,7 +137,7 @@ class TableModelConfig(ConfParser):
 
         if not header and field_element.hasAttribute('header'):
 
-            raise exceptions.ModelConfigHeaderError(self.model, field_element)
+            raise ModelConfigHeaderError(self.model, field_element)
 
         elif header:
 
@@ -138,7 +149,7 @@ class TableModelConfig(ConfParser):
 
                 self.model.headers[index_column] = header
 
-        if not header and self.field_element.nodeName == 'append':
+        if not header and field_element.nodeName == 'append':
 
             self.models.headers.append(field_element.getAttibute('name'))
 
@@ -149,13 +160,13 @@ class TableModelConfig(ConfParser):
         if field_element.hasAttribute('align'):
 
             if not align:
-                raise exceptions.ModelConfigAlingError(
+                raise ModelConfigAlignError(
                     self.model,
                     field_element
                 )
 
             if not align in self.aligments_mapping.keys():
-                raise exceptions.ModelConfigAlignValueError(
+                raise ModelConfigAlignValueError(
                     self.model,
                     field_element
                 )
@@ -188,7 +199,7 @@ class TableModelConfig(ConfParser):
 
             except ValueError:
 
-                raise exceptions.ModelConfigHexColorError(
+                raise ModelConfigHexColorError(
                     self.model,
                     'background',
                     background,
@@ -222,7 +233,7 @@ class TableModelConfig(ConfParser):
 
             except ValueError:
 
-                raise exceptions.ModelConfigHexColorError(
+                raise ModelConfigHexColorError(
                     self.model,
                     'foreground',
                     foreground,
@@ -246,25 +257,39 @@ class TableModelConfig(ConfParser):
     def setRelatedField(self, field_element, index_column):
 
         relatedfield = field_element.getAttribute('relatedfield')
-        schema = self.model.schema()
 
         if not relatedfield:
 
             return
 
+        schema = self.model.schema()
+
         try:
+
             related_attr, field_attr = relatedfield.split(':')
 
         except ValueError:
-            raise exceptions.ModelConfigRelatedFieldError(
+
+            raise ModelConfigRelatedFieldError(
                 self.model,
                 field_element
             )
 
         if not hasattr(schema, related_attr):
-            raise exceptions.ModelConfigRelatedAttributeError(
+
+            raise ModelConfigRelatedAttributeError(
                 self.model,
                 related_attr,
+                field_element
+            )
+
+        related = getattr(schema, related_attr)
+
+        if not hasattr(related, field_attr):
+
+            raise ModelConfigRelatedAttributeError(
+                self.model,
+                field_attr,
                 field_element
             )
 

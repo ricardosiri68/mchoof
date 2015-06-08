@@ -1,5 +1,12 @@
 from PySide.QtCore import SIGNAL
-from . import exceptions
+from .exceptions.view_exceptions import ViewAttributeError
+from .exceptions.model_binding_exceptions import (
+    ModelBindingFilterNonInputError,
+    ModelBindingFilterTypeMethodError,
+    ModelBindingFilterNonTypeError,
+    ModelBindingFilterMethodError,
+    ModelBindingNonFilterMethodError
+)
 
 
 class ModelBindFilterParser:
@@ -23,13 +30,13 @@ class ModelBindFilterParser:
                 input_attr = getattr(self.parent, input)
 
             else:
-                raise exceptions.ViewAttributeError(
+                raise ViewAttributeError(
                     self.parent,
                     input,
                     model_binding
                 )
         else:
-            raise exceptions.ModelBindingFilterNonInputError(
+            raise ModelBindingFilterNonInputError(
                 self.parent,
                 model_binding
             )
@@ -39,13 +46,13 @@ class ModelBindFilterParser:
                 filter_type_method = getattr(self, filter_type)
 
             else:
-                raise exceptions.ModelBindingFilterTypeMethodError(
+                raise ModelBindingFilterTypeMethodError(
                     self.parent,
                     filter_type,
                     model_binding
                 )
         else:
-            raise exceptions.ModelBindingFilterNonTypeError(
+            raise ModelBindingFilterNonTypeError(
                 self.parent,
                 model_binding
             )
@@ -55,13 +62,13 @@ class ModelBindFilterParser:
                 filter_method = getattr(model, model_method)
 
             else:
-                raise exceptions.ModelBindingFilterMethodError(
+                raise ModelBindingFilterMethodError(
                     model,
                     model_method,
                     model_binding
                 )
         else:
-            raise exceptions.ModelBindingNonFilterMethodError(
+            raise ModelBindingNonFilterMethodError(
                 model,
                 model_binding
             )

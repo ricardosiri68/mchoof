@@ -1,8 +1,14 @@
 import os
-from PySide.QtGui import QPixmap, QIcon, QShortcut, QKeySequence
+from PySide.QtGui import QPixmap, QIcon, QKeySequence
 from PySide.QtCore import SIGNAL, Qt
 from .parser import ConfParser
-from . import exceptions
+from .exceptions.menu_exceptions import (
+    MenuNameError,
+    MenuTitleError,
+    ActionTargetError,
+    MenuShortcutError,
+    MenuShortcutKeysecuenceError
+)
 
 
 class MenuBarParser(ConfParser):
@@ -47,10 +53,10 @@ class MenuBarParser(ConfParser):
         disabled = action.hasAttribute('disabled')
 
         if not name:
-            raise exceptions.MenuNameError(action)
+            raise MenuNameError(action)
 
         if not title:
-            raise exceptions.MenuTitleError(action)
+            raise MenuTitleError(action)
 
         menu = parentMenu.addMenu(title)
 
@@ -83,13 +89,13 @@ class MenuBarParser(ConfParser):
         disabled = action.hasAttribute('disabled')
 
         if not name:
-            raise exceptions.MenuNameError(action)
+            raise MenuNameError(action)
 
         if not title:
-            raise exceptions.MenuTitleError(action)
+            raise MenuTitleError(action)
 
         if not target:
-            raise exceptions.ActionTargetError(action)
+            raise ActionTargetError(action)
 
         actionMenu = parentMenu.addAction(title)
 
@@ -115,7 +121,7 @@ class MenuBarParser(ConfParser):
 
         if not shortcut and action.hasAttribute('shortcut'):
 
-            raise exceptions.MenuShortcutError(action)
+            raise MenuShortcutError(action)
 
         elif shortcut:
 
@@ -126,7 +132,7 @@ class MenuBarParser(ConfParser):
 
             except AttributeError:
 
-                raise exceptions.MenuShortcutKeysecuenceError(
+                raise MenuShortcutKeysecuenceError(
                     self.parent,
                     shortcut,
                     action
