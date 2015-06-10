@@ -1,5 +1,6 @@
 *.pyc
 build/
 dist/
+tests/main_app/local_settings.py
 __pycache__/
 .ropeproject/

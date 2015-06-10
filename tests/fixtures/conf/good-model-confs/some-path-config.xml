@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <model name="GoodTestModel" >
+        <field name="task" header="Task Header" background="#444444" foreground="#eeeeee" align="center" />
+        <field name="parent_id" hidden="hidden" />
+    </model>
+</root>
