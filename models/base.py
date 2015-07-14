@@ -300,7 +300,7 @@ class TableModel(QAbstractTableModel, BaseModel):
 
     def removeRow(self, row, index=QModelIndex()):
 
-        self.session.delete(self.records.pop(index.row()))
+        del self.records[row]
         return True
 
     def delete(self, index):
