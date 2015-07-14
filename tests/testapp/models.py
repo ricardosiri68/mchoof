@@ -1,4 +1,12 @@
-from .schema import *
+from mchoof.models.base import TableModel
+from .schema import Todo, ParentTodo
 
 
-# yourmodels go here
+class ParentModel(TableModel):
+
+    schema = ParentTodo
+
+
+class TestModel(TableModel):
+
+    schema = Todo
