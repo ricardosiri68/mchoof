@@ -4,6 +4,8 @@ from PySide.QtCore import QAbstractTableModel, Qt, QModelIndex, QDate,\
 from PySide.QtGui import QPixmap
 from mchoof.core import db_session
 from mchoof.models import exceptions
+from mchoof.config.exceptions\
+    .model_config_exceptions import ModelConfigRelatedAttributeError
 from mchoof.models.query_methods import QueryMethod
 from mchoof.config.table_model import TableModelConfig
 
@@ -153,8 +155,21 @@ class TableModel(QAbstractTableModel, BaseModel):
 
         elif isinstance(data, long) and index.column() in self.related_fields:
 
-            attribute, field = self.related_fields[index.column()]
-            record_attribute = getattr(self.records[index.row()], attribute)
+            attribute, field, xml_element = self.related_fields[index.column()]
+
+            try:
+                record_attribute = getattr(
+                    self.records[index.row()],
+                    attribute
+                )
+
+            except AttributeError:
+
+                ModelConfigRelatedAttributeError(
+                    self,
+                    field_attr,
+                    xml_element
+                )
 
             return getattr(record_attribute, field)
 

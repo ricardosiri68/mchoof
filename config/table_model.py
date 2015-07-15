@@ -283,19 +283,10 @@ class TableModelConfig(ConfParser):
                 field_element
             )
 
-        related = getattr(schema, related_attr)
-
-        if not hasattr(related, field_attr):
-
-            raise ModelConfigRelatedAttributeError(
-                self.model,
-                field_attr,
-                field_element
-            )
-
         self.model.related_fields[index_column] = (
             related_attr,
-            field_attr
+            field_attr,
+            field_element
         )
 
         del schema
