@@ -33,3 +33,19 @@ class BadTestModel:
         self.backgrounds = len(self.headers) * [None]
         self.foregrounds = len(self.headers) * [None]
         self.related_fields = {}
+
+
+class GoodTestModel:
+
+    schema = MockSchema
+
+    def __init__(self):
+
+        self.headers = self.field_keys = ['id', 'task', 'parent_id', 'done']
+        self.aligments = len(self.headers) * [
+            int(Qt.AlignVCenter | Qt.AlignLeft)
+        ]
+
+        self.backgrounds = len(self.headers) * [None]
+        self.foregrounds = len(self.headers) * [None]
+        self.related_fields = {}

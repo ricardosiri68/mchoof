@@ -3,7 +3,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 
-app_settings = __import__(os.environ.get('MCHOOF_SETTINGS'))
+app_settings = __import__('main_app.settings')
 
 
 def get_session():

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+
+    <action name="start" title="Inicio">
+        <action name="exit" title="Salir" target="actionExit"/>
+    </action>
+
+</root>
