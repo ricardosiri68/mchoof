@@ -1,0 +1,4 @@
+% for a in range(10):
+    ${name} - ${lastname}
+--------------------------------
+% endfor
