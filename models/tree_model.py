@@ -6,10 +6,12 @@ from mchoof.config.tree_model import TreeModelConfig
 
 class TreeModel(QAbstractItemModel, BaseModel):
 
-    childnodes_attr = None
     first_col_size = QSize(10, 20)
     rest_col_size = QSize(100, 20)
-    column_count = 0
+
+    __childnodes_attr = None
+    __column_methods = []
+    __headers = []
 
     def __init__(self, parent=None):
 
@@ -28,13 +30,7 @@ class TreeModel(QAbstractItemModel, BaseModel):
 
     def columnCount(self, parent):
 
-        if parent.isValid():
-
-            return len(self.childSchema.__table__.columns.keys())
-
-        else:
-
-            return len(self.schema.__table__.columns.keys())
+        return len(self.__column_methods)
 
     def rowCount(self, parent):
 
@@ -58,11 +54,10 @@ class TreeModel(QAbstractItemModel, BaseModel):
 
         if index.column():
 
-            node = index.internalPointer()
-            record = node.record()
-            keys = record.__table__.columns.keys()
-
-            return getattr(record, keys[index.column()])
+            return self.column_methods[index.column()](
+                index,
+                Qt.DisplayRole
+            )
 
     def data_edit(self, index):
 
@@ -78,10 +73,10 @@ class TreeModel(QAbstractItemModel, BaseModel):
 
     def headerData(self, section, orientation, role=Qt.DisplayRole):
 
-        if role == Qt.DisplayRole:
+        if role == Qt.DisplayRole and orientation == Qt.Horizontal:
 
             if section:
-                return "BZNHeader"
+                return self.headers[section]
 
     def parent(self, index):
 
@@ -123,9 +118,30 @@ class TreeModel(QAbstractItemModel, BaseModel):
 
                 Node(childrecord, node)
 
+    @property
+    def column_methods(self):
+
+        return self.__column_methods
+
+    @property
+    def headers(self):
+
+        return self.__headers
+
+    @property
+    def childnodes_attr(self):
+
+        return self.__childnodes_attr
+
+    @childnodes_attr.setter
+    def childnodes_attr(self, value):
+
+        self.__childnodes_attr = value
+
     def add(self, row, **kwargs):
 
         index = self.index(row, 0)
+
         self.beginInsertRows(index.parent(), index.row(), index.row())
 
         newobject = self.schema(**kwargs)

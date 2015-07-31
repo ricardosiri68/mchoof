@@ -43,50 +43,37 @@ class TreeModelConfig(ConfParser):
 
             raise ModelConfNotFound(self.model)
 
-        self.configModel()
-
-    def configModel(self):
-
-        try:
-
-            col_count = int(self.model_element.getAttribute('col_count'))
-
-        except ValueError:
-            pass
-
+        self.config()
         self.configColumns()
-        self.configChildnodes()
 
-    def configChildNodes(self):
+    def config(self):
+        '''configura el modelo'''
 
-        childnodes = None
+        childnodes_attr = self.model_element.getAttribute('childnodes_attr')
+
+        if not childnodes_attr:
+
+            raise Exception('childnode_attr no esta definido en TreeModel')
+
+        self.model.childnodes_attr = childnodes_attr
+
+    def configColumns(self):
+
         for element in self.model_element.childNodes:
 
-            if element.nodeName == 'childnodes':
+            if element.nodeName == 'column':
 
-                childnodes = element
+                self.configColumn(element)
 
-        if not childnodes:
+    def configColumn(self, element):
 
-            raise ModelConfigNotChildNodeError(
-                self.model,
-                self.model_element
-            )
+        name = element.getAttribute('name')
+        header = element.getAttribute('header')
 
-        childnodes_name = childnodes.getAttribute('name')
+        if not name:
 
-        if not childnodes_name:
+            raise ModelConfigNameError(self.model, element)
 
-            raise ModelConfigNotChildNodeError(
-                self.model,
-                self.model_element
-            )
+        self.model.column_methods.append(getattr(self.model, name))
 
-        if not hasattr(self.model.schema, childnodes_name):
-            raise ModelConfigRelatedAttributeError(
-                self.model,
-                childnodes_name,
-                self.model_element
-            )
-
-        self.model.childnodes_attr = childnodes_name
+        self.model.headers.append(header if header else name)
