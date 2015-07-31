@@ -1,14 +1,14 @@
-import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-
-
-app_settings = __import__('main_app.settings')
+from .get_settings import get_database_url
 
 
 def get_session():
 
-    if app_settings.settings.DATABASE_URL:
-        engine = create_engine(app_settings.settings.DATABASE_URL)
+    database_url = get_database_url()
+
+    if database_url:
+
+        engine = create_engine(database_url)
         Session = sessionmaker(bind=engine, autoflush=False)
         return Session()
