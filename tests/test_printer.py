@@ -1,35 +1,13 @@
 import unittest
-from mchoof.printer.base import BasePrinter
 from mchoof.printer.base_escpos import SerialEscpos
 from mako.template import Template
 from mako.runtime import Context
 from StringIO import StringIO
 
 
-SERIAL_PORT = '/dev/ttyUSB0'
+SERIAL_PORT = '/dev/pts/9'
 
 
-# class TestPrinter(unittest.TestCase):
-#
-#     def setUp(self):
-#
-#         self.printer = BasePrinter(SERIAL_PORT)
-#
-#     def tearDown(self):
-#
-#         del self.printer
-#
-#     def test_template(self):
-#
-#         self.printer.write_template(
-#             'printer_templates/test_template.ptpl',
-#             **{
-#                 'name': 'Ricardo',
-#                 'lastname': 'Siri'
-#             }
-#         )
-#
-#
 class TestEscpos(unittest.TestCase):
 
     def setUp(self):
