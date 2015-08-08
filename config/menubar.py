@@ -14,19 +14,25 @@ from .exceptions.menu_exceptions import (
 class MenuBarParser(ConfParser):
 
     def __init__(self, parent):
+
         conf_path = os.path.join(
             parent.__class__.__module__.split('.')[0],
             'conf',
             parent.menubar_conf
         )
+
         self.parent = parent
         ConfParser.__init__(self, conf_path)
         parentMenu = self.parent.menubar
+
         self.bindActions(parentMenu, self.rootNode().childNodes)
 
     def bindActions(self, parentMenu, actions):
+
         for action in actions:
+
             if action.nodeName == 'action':
+
                 if action.parentNode.tagName == 'root' and action.childNodes:
 
                     self.bindActions(
